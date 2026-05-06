@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>שרשור – בקוגן ישראל</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .thread-wrapper { max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem; }
+    .thread-op {
+      background: var(--bg-card); border: 1px solid var(--border-accent);
+      border-radius: var(--radius-lg); margin-bottom: 2rem; overflow: hidden;
+    }
+    .thread-op-header {
+      padding: 1.25rem 1.5rem; background: rgba(255,102,0,0.06);
+      border-bottom: 1px solid var(--border);
+    }
+    .thread-title-main { font-size: 1.5rem; font-weight: 800; margin-bottom: 0.5rem; }
+    .thread-breadcrumb { font-size: 0.85rem; color: var(--text-secondary); display: flex; gap: 0.5rem; align-items: center; }
+    .thread-breadcrumb a { color: var(--accent); text-decoration: none; }
+    .thread-op-body { padding: 1.5rem; line-height: 1.8; color: var(--text-secondary); }
+    .thread-op-footer { padding: 1rem 1.5rem; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 1rem; }
+    .post-number { font-size: 0.75rem; color: var(--text-muted); margin-right: auto; }
+    .reply-form { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem; margin-top: 2rem; }
+    .reply-form h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 1rem; }
+    .locked-notice { background: rgba(150,150,150,0.1); border: 1px solid rgba(150,150,150,0.3); border-radius: var(--radius); padding: 1rem 1.25rem; text-align: center; color: var(--text-secondary); margin-top: 2rem; }
+    .admin-actions { display: flex; gap: 0.5rem; margin-right: auto; }
+  </style>
+</head>
+<body>
+  <nav class="navbar" id="navbar"></nav>
+  <div class="page-wrapper">
+    <div class="thread-wrapper">
+      <div id="thread-container"><div class="spinner" style="margin-top:3rem"></div></div>
+      <div id="posts-container"></div>
+      <div id="thread-pagination" class="pagination"></div>
+      <div id="reply-area"></div>
+    </div>
+  </div>
+  <footer class="footer"><div class="container"><div class="footer-bottom"><p>© 2026 בקוגן ישראל</p></div></div></footer>
+  <script src="/js/main.js"></script>
+  <script>
+    const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    const escNl = s => esc(s).replace(/\n/g,'<br>');
+
+    const params = new URLSearchParams(location.search);
+    const threadId = params.get('id');
+    let currentPage = parseInt(params.get('page') || '1');
+    let threadData = null;
+
+    if (!threadId) window.location.href = '/forums';
+
+    async function loadThread() {
+      try {
+        const data = await apiFetch(`/forums/threads/${threadId}?page=${currentPage}`);
+        threadData = data.thread;
+        renderThread(data);
+      } catch(e) {
+        document.getElementById('thread-container').innerHTML = `<div class="empty-state"><div class="icon">❌</div><p>${e.message}</p></div>`;
+      }
+    }
+
+    function renderThread(data) {
+      const { thread, posts, pages } = data;
+      const isAdmin = Auth.isAdmin();
+      const currentUser = Auth.getUser();
+
+      document.title = `${thread.title} – בקוגן ישראל`;
+
+      document.getElementById('thread-container').innerHTML = `
+        <div class="thread-op">
+          <div class="thread-op-header">
+            <div class="thread-breadcrumb">
+              <a href="/forums">פורום</a> ← <a href="/forums?cat=${encodeURIComponent(thread.category_id)}">${esc(thread.category_name)}</a>
+            </div>
+            <h1 class="thread-title-main">
+              ${thread.is_pinned ? '<span class="badge-pinned">📌 נעוץ</span> ' : ''}
+              ${thread.is_locked ? '<span class="badge-locked">🔒 נעול</span> ' : ''}
+              ${esc(thread.title)}
+            </h1>
+            <div class="thread-meta" style="margin-top:0.5rem">
+              <span>✍️ ${esc(thread.username)}</span>
+              <span>·</span>
+              <span>📅 ${formatDate(thread.created_at)}</span>
+              <span>·</span>
+              <span>👁️ ${thread.views} צפיות</span>
+              <span>·</span>
+              <span>💬 ${thread.post_count} תגובות</span>
+              ${isAdmin ? `<span style="margin-right:auto;display:flex;gap:0.5rem">
+                <button class="btn btn-sm btn-secondary" onclick="adminAction('pin')">📌 ${thread.is_pinned ? 'בטל נעיצה' : 'נעץ'}</button>
+                <button class="btn btn-sm btn-secondary" onclick="adminAction('lock')">🔒 ${thread.is_locked ? 'פתח' : 'נעל'}</button>
+                <button class="btn btn-sm btn-danger" onclick="adminAction('delete')">🗑️ מחק</button>
+              </span>` : ''}
+            </div>
+          </div>
+          <div class="thread-op-body">${escNl(thread.content)}</div>
+          <div class="thread-op-footer">
+            <div class="post-avatar" style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--darkus));display:flex;align-items:center;justify-content:center;font-weight:700">${thread.username[0]}</div>
+            <div>
+              <div style="font-weight:700">${thread.username}</div>
+              <div style="font-size:0.8rem;color:var(--text-secondary)">חבר מ-${formatDate(thread.user_joined)}</div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      const postsEl = document.getElementById('posts-container');
+      if (!posts.length && currentPage === 1) {
+        postsEl.innerHTML = '<div class="empty-state"><div class="icon">💬</div><p>היה הראשון להגיב!</p></div>';
+      } else {
+        postsEl.innerHTML = posts.map((p, i) => `
+          <div class="post-card" id="post-${p.id}">
+            <div class="post-header">
+              <div class="post-avatar">${esc(p.username[0])}</div>
+              <div class="post-user-info">
+                <div class="post-username">${esc(p.username)} ${p.role === 'admin' ? '👑' : p.role === 'moderator' ? '🛡️' : ''}</div>
+                <div class="post-date">${formatDateTime(p.created_at)} · ${p.user_post_count} פוסטים</div>
+              </div>
+              <span class="post-number">#${(currentPage-1)*20 + i + 2}</span>
+              ${(isAdmin || currentUser?.id === p.user_id) ? `<button class="btn btn-sm btn-danger btn-icon" onclick="deletePost(${p.id})" title="מחק תגובה">🗑️</button>` : ''}
+            </div>
+            <div class="post-body">${escNl(p.content)}</div>
+          </div>
+        `).join('');
+      }
+
+      // Pagination
+      if (pages > 1) {
+        const pEl = document.getElementById('thread-pagination');
+        pEl.innerHTML = Array.from({length: pages}, (_,i) => `
+          <div class="page-btn ${i+1===currentPage?'active':''}" onclick="goToPage(${i+1})">${i+1}</div>
+        `).join('');
+      }
+
+      // Reply form
+      const replyEl = document.getElementById('reply-area');
+      if (thread.is_locked) {
+        replyEl.innerHTML = '<div class="locked-notice">🔒 השרשור נעול – לא ניתן להגיב</div>';
+      } else if (Auth.isLoggedIn()) {
+        replyEl.innerHTML = `
+          <div class="reply-form">
+            <h3>💬 הוסף תגובה</h3>
+            <textarea id="reply-content" class="form-input" rows="5" placeholder="כתוב את תגובתך..."></textarea>
+            <div id="reply-error" class="form-error hidden mt-1"></div>
+            <div style="display:flex;justify-content:flex-end;margin-top:0.75rem">
+              <button class="btn btn-primary" onclick="submitReply()">שלח תגובה 📤</button>
+            </div>
+          </div>`;
+      } else {
+        replyEl.innerHTML = `<div class="locked-notice"><a href="/login" style="color:var(--accent)">התחבר</a> כדי להגיב</div>`;
+      }
+    }
+
+    function goToPage(p) {
+      currentPage = p;
+      history.pushState({}, '', `?id=${threadId}&page=${p}`);
+      loadThread();
+      window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+
+    async function submitReply() {
+      const content = document.getElementById('reply-content').value.trim();
+      const errEl = document.getElementById('reply-error');
+      errEl.classList.add('hidden');
+      if (!content) { errEl.textContent = '⚠️ כתוב תגובה לפני שליחה'; errEl.classList.remove('hidden'); return; }
+      try {
+        await apiFetch(`/forums/threads/${threadId}/posts`, { method: 'POST', body: { content } });
+        showToast('תגובה נוספה בהצלחה!', 'success');
+        document.getElementById('reply-content').value = '';
+        loadThread();
+      } catch(e) { errEl.textContent = '⚠️ ' + e.message; errEl.classList.remove('hidden'); }
+    }
+
+    async function deletePost(id) {
+      if (!confirm('למחוק את התגובה?')) return;
+      try {
+        await apiFetch(`/forums/posts/${id}`, { method: 'DELETE' });
+        showToast('תגובה נמחקה', 'info');
+        loadThread();
+      } catch(e) { showToast(e.message, 'error'); }
+    }
+
+    async function adminAction(action) {
+      if (action === 'delete' && !confirm('למחוק את השרשור לגמרי?')) return;
+      try {
+        if (action === 'pin') await apiFetch(`/forums/threads/${threadId}/pin`, { method: 'PATCH' });
+        if (action === 'lock') await apiFetch(`/forums/threads/${threadId}/lock`, { method: 'PATCH' });
+        if (action === 'delete') {
+          await apiFetch(`/forums/threads/${threadId}`, { method: 'DELETE' });
+          window.location.href = '/forums'; return;
+        }
+        showToast('עודכן בהצלחה', 'success');
+        loadThread();
+      } catch(e) { showToast(e.message, 'error'); }
+    }
+
+    loadThread();
+  </script>
+</body>
+</html>

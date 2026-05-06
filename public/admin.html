@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>לוח מנהל – בקוגן ישראל</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <nav class="navbar" id="navbar"></nav>
+  <div class="page-wrapper">
+    <div class="page-banner">
+      <div class="page-banner-bg" style="background:linear-gradient(135deg,#1a0a00,#3a1500,#ff4500)"></div>
+      <div class="page-banner-overlay"></div>
+      <div class="page-banner-content">
+        <h1 class="page-banner-title">⚙️ לוח <span style="color:var(--accent)">מנהל</span></h1>
+        <p class="page-banner-subtitle">ניהול הקהילה, תוכן ומשתמשים</p>
+      </div>
+    </div>
+    <div class="container" style="padding-top:2rem;padding-bottom:4rem">
+      <div class="admin-grid">
+        <div class="admin-sidebar">
+          <div class="admin-nav-item active" onclick="switchSection('dashboard', this)">📊 לוח בקרה</div>
+          <div class="admin-nav-item" onclick="switchSection('users', this)">👥 משתמשים</div>
+          <div class="admin-nav-item" onclick="switchSection('events', this)">🏆 אירועים</div>
+          <div class="admin-nav-item" onclick="switchSection('video', this)">🎬 סרטון פתיחה</div>
+          <div class="admin-nav-item" onclick="switchSection('categories', this)">💬 קטגוריות פורום</div>
+          <div class="divider"></div>
+          <div class="admin-nav-item" onclick="location.href='/'">← חזרה לאתר</div>
+        </div>
+
+        <div>
+          <!-- Dashboard -->
+          <div id="section-dashboard">
+            <h2 style="font-size:1.4rem;font-weight:800;margin-bottom:1.5rem">📊 סקירה כללית</h2>
+            <div class="stats-grid" id="admin-stats"></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-top:0">
+              <div>
+                <h3 style="font-weight:700;margin-bottom:1rem">👤 משתמשים חדשים</h3>
+                <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden">
+                  <table class="data-table" id="recent-users-table"></table>
+                </div>
+              </div>
+              <div>
+                <h3 style="font-weight:700;margin-bottom:1rem">💬 שרשורים חדשים</h3>
+                <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden">
+                  <table class="data-table" id="recent-threads-table"></table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Users -->
+          <div id="section-users" class="hidden">
+            <h2 style="font-size:1.4rem;font-weight:800;margin-bottom:1.5rem">👥 ניהול משתמשים</h2>
+            <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden">
+              <table class="data-table" id="users-table">
+                <thead><tr><th>שם משתמש</th><th>אימייל</th><th>תפקיד</th><th>הצטרף</th><th>פעולות</th></tr></thead>
+                <tbody id="users-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Events -->
+          <div id="section-events" class="hidden">
+            <div class="flex items-center justify-between mb-3">
+              <h2 style="font-size:1.4rem;font-weight:800">🏆 ניהול אירועים</h2>
+              <a href="/events" class="btn btn-sm btn-outline">פתח דף אירועים</a>
+            </div>
+            <div id="admin-events-list"></div>
+          </div>
+
+          <!-- Video -->
+          <div id="section-video" class="hidden">
+            <h2 style="font-size:1.4rem;font-weight:800;margin-bottom:1.5rem">🎬 סרטון פתיחה</h2>
+            <div class="card" style="max-width:500px">
+              <p style="color:var(--text-secondary);margin-bottom:1.5rem;line-height:1.7">
+                הגדר את סרטון הפתיחה שיוצג ברקע של הדף הראשי.<br>
+                1. פתח YouTube ומצא את פתיחת בקוגן<br>
+                2. העתק את ה-ID מה-URL (לדוגמה: <code style="color:var(--accent)">xxxxxxxx</code> מ-youtube.com/watch?v=<strong>xxxxxxxx</strong>)<br>
+                3. הדבק כאן ולחץ שמור
+              </p>
+              <div class="form-group">
+                <label class="form-label">YouTube Video ID</label>
+                <input type="text" id="video-id-input" class="form-input" dir="ltr" placeholder="למשל: dQw4w9WgXcQ" value="">
+              </div>
+              <div style="margin-bottom:1rem">
+                <small style="color:var(--text-secondary)">
+                  💡 טיפ: חפש ב-YouTube "Bakugan Battle Brawlers Opening" ולחץ על הסרטון המקורי
+                </small>
+              </div>
+              <button class="btn btn-primary" onclick="saveVideoId()">שמור</button>
+              <button class="btn btn-secondary" onclick="clearVideoId()" style="margin-right:0.5rem">הסר סרטון</button>
+              <div id="video-save-msg" class="hidden mt-2"></div>
+            </div>
+          </div>
+
+          <!-- Categories -->
+          <div id="section-categories" class="hidden">
+            <h2 style="font-size:1.4rem;font-weight:800;margin-bottom:1.5rem">💬 קטגוריות פורום</h2>
+            <div class="card mb-3" style="max-width:500px">
+              <h3 style="font-weight:700;margin-bottom:1rem">הוסף קטגוריה</h3>
+              <div class="form-group"><label class="form-label">שם</label><input id="cat-name" class="form-input" placeholder="שם הקטגוריה..."></div>
+              <div class="form-group"><label class="form-label">תיאור</label><input id="cat-desc" class="form-input" placeholder="תיאור קצר..."></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+                <div class="form-group"><label class="form-label">אמוג'י</label><input id="cat-icon" class="form-input" placeholder="💬" maxlength="4"></div>
+                <div class="form-group"><label class="form-label">סדר</label><input type="number" id="cat-order" class="form-input" value="0"></div>
+              </div>
+              <button class="btn btn-primary" onclick="addCategory()">הוסף</button>
+            </div>
+            <div id="categories-admin-list"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer"><div class="container"><div class="footer-bottom"><p>© 2026 בקוגן ישראל</p></div></div></footer>
+  <script src="/js/main.js"></script>
+  <script>
+    if (!Auth.isLoggedIn() || !Auth.isAdmin()) {
+      window.location.replace('/');
+    }
+
+    function switchSection(id, el) {
+      document.querySelectorAll('[id^="section-"]').forEach(s => s.classList.add('hidden'));
+      document.querySelectorAll('.admin-nav-item').forEach(n => n.classList.remove('active'));
+      document.getElementById(`section-${id}`)?.classList.remove('hidden');
+      el.classList.add('active');
+      loadSection(id);
+    }
+
+    async function loadSection(id) {
+      if (id === 'dashboard') loadDashboard();
+      if (id === 'users') loadUsers();
+      if (id === 'events') loadAdminEvents();
+      if (id === 'categories') loadCategories();
+      if (id === 'video') {
+        const saved = localStorage.getItem('hero_video_id') || '';
+        document.getElementById('video-id-input').value = saved;
+      }
+    }
+
+    async function loadDashboard() {
+      const data = await apiFetch('/admin/dashboard');
+      const statsEl = document.getElementById('admin-stats');
+      const labels = { users: 'משתמשים', threads: 'שרשורים', posts: 'תגובות', events: 'אירועים', wiki: 'דפי ויקי', applications: 'הרשמות' };
+      statsEl.innerHTML = Object.entries(data.stats).map(([k,v]) => `
+        <div class="stat-card"><div class="stat-card-num">${v}</div><div class="stat-card-label">${labels[k]||k}</div></div>
+      `).join('');
+      document.getElementById('recent-users-table').innerHTML =
+        '<thead><tr><th>שם</th><th>אימייל</th><th>תפקיד</th></tr></thead><tbody>' +
+        data.recentUsers.map(u => `<tr><td>${u.username}</td><td style="direction:ltr;text-align:left">${u.email}</td><td>${u.role}</td></tr>`).join('') + '</tbody>';
+      document.getElementById('recent-threads-table').innerHTML =
+        '<thead><tr><th>כותרת</th><th>מאת</th></tr></thead><tbody>' +
+        data.recentThreads.map(t => `<tr><td><a href="/thread?id=${t.id}" style="color:var(--accent)">${t.title}</a></td><td>${t.username}</td></tr>`).join('') + '</tbody>';
+    }
+
+    async function loadUsers() {
+      const users = await apiFetch('/admin/users');
+      document.getElementById('users-tbody').innerHTML = users.map(u => `
+        <tr>
+          <td><strong>${u.username}</strong></td>
+          <td style="direction:ltr;text-align:left;font-size:0.85rem">${u.email}</td>
+          <td>
+            <select onchange="changeRole('${u.id}', this.value)" class="form-input" style="padding:0.3rem;font-size:0.82rem;width:auto">
+              <option value="user" ${u.role==='user'?'selected':''}>user</option>
+              <option value="moderator" ${u.role==='moderator'?'selected':''}>moderator</option>
+              <option value="admin" ${u.role==='admin'?'selected':''}>admin</option>
+            </select>
+          </td>
+          <td class="text-sm text-muted">${formatDate(u.created_at)}</td>
+          <td><button class="btn btn-sm btn-danger" onclick="deleteUser('${u.id}')">מחק</button></td>
+        </tr>
+      `).join('');
+    }
+
+    async function changeRole(id, role) {
+      try { await apiFetch(`/admin/users/${id}/role`, { method: 'PATCH', body: { role } }); showToast('תפקיד עודכן', 'success'); }
+      catch(e) { showToast(e.message, 'error'); loadUsers(); }
+    }
+
+    async function deleteUser(id) {
+      if (!confirm('למחוק משתמש זה? הפעולה בלתי הפיכה!')) return;
+      try { await apiFetch(`/admin/users/${id}`, { method: 'DELETE' }); showToast('משתמש נמחק', 'info'); loadUsers(); }
+      catch(e) { showToast(e.message, 'error'); }
+    }
+
+    async function loadAdminEvents() {
+      const events = await apiFetch('/events');
+      document.getElementById('admin-events-list').innerHTML = events.map(e => `
+        <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;margin-bottom:0.75rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
+          <div style="flex:1">
+            <div style="font-weight:700">${e.title}</div>
+            <div class="text-sm text-muted">${formatEventDate(e.event_date)} · ${e.location} · ${e.participant_count} נרשמו</div>
+          </div>
+          <span class="event-status status-${e.status}" style="position:static">${{upcoming:'קרוב',ongoing:'פעיל',completed:'הסתיים'}[e.status]||e.status}</span>
+          <button class="btn btn-sm btn-danger" onclick="deleteEvent(${e.id})">🗑️ מחק</button>
+        </div>
+      `).join('') || '<p class="text-muted">אין אירועים</p>';
+    }
+
+    async function deleteEvent(id) {
+      if (!confirm('למחוק אירוע זה?')) return;
+      try { await apiFetch(`/events/${id}`, { method: 'DELETE' }); showToast('נמחק', 'info'); loadAdminEvents(); }
+      catch(e) { showToast(e.message, 'error'); }
+    }
+
+    async function loadCategories() {
+      const cats = await apiFetch('/forums/categories');
+      document.getElementById('categories-admin-list').innerHTML = cats.map(c => `
+        <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:0.85rem 1.25rem;margin-bottom:0.5rem;display:flex;align-items:center;gap:1rem">
+          <span style="font-size:1.4rem">${c.icon}</span>
+          <div style="flex:1"><div style="font-weight:600">${c.name}</div><div class="text-sm text-muted">${c.description}</div></div>
+          <span class="text-sm text-muted">${c.thread_count} שרשורים</span>
+          <button class="btn btn-sm btn-danger" onclick="deleteCategory(${c.id})">🗑️</button>
+        </div>
+      `).join('');
+    }
+
+    async function addCategory() {
+      const name = document.getElementById('cat-name').value.trim();
+      const description = document.getElementById('cat-desc').value.trim();
+      const icon = document.getElementById('cat-icon').value.trim() || '💬';
+      const order_num = parseInt(document.getElementById('cat-order').value) || 0;
+      if (!name) { showToast('שם נדרש', 'error'); return; }
+      try { await apiFetch('/admin/categories', { method: 'POST', body: { name, description, icon, order_num } }); showToast('נוסף!', 'success'); loadCategories(); ['cat-name','cat-desc','cat-icon'].forEach(id => document.getElementById(id).value = ''); }
+      catch(e) { showToast(e.message, 'error'); }
+    }
+
+    async function deleteCategory(id) {
+      if (!confirm('למחוק קטגוריה?')) return;
+      try { await apiFetch(`/admin/categories/${id}`, { method: 'DELETE' }); showToast('נמחקה', 'info'); loadCategories(); }
+      catch(e) { showToast(e.message, 'error'); }
+    }
+
+    function saveVideoId() {
+      const id = document.getElementById('video-id-input').value.trim();
+      localStorage.setItem('hero_video_id', id);
+      const msg = document.getElementById('video-save-msg');
+      msg.className = 'form-success'; msg.textContent = '✅ שמור! רענן את הדף הראשי לראות את הסרטון.';
+      msg.classList.remove('hidden');
+      showToast('מזהה וידאו נשמר!', 'success');
+    }
+    function clearVideoId() {
+      localStorage.removeItem('hero_video_id');
+      document.getElementById('video-id-input').value = '';
+      showToast('סרטון הוסר', 'info');
+    }
+
+    loadDashboard();
+  </script>
+</body>
+</html>

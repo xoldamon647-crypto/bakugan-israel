@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>אירועים – בקוגן ישראל</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .events-filters { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 2rem; }
+    .filter-btn {
+      padding: 0.5rem 1.25rem; border-radius: 50px;
+      background: var(--bg-card); border: 1px solid var(--border);
+      color: var(--text-secondary); font-weight: 600; font-size: 0.88rem;
+      cursor: pointer; transition: var(--transition);
+    }
+    .filter-btn.active, .filter-btn:hover { background: var(--accent); border-color: var(--accent); color: white; }
+    .apply-modal-event-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 1.25rem; }
+    .event-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; }
+    .event-detail-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; }
+    .event-detail-label { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 0.3rem; }
+    .event-detail-value { font-weight: 600; }
+    .participants-list { display: flex; flex-direction: column; gap: 0.4rem; max-height: 200px; overflow-y: auto; }
+    .participant-item { display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem 0.75rem; background: var(--bg-card); border-radius: 6px; font-size: 0.88rem; }
+    @media (max-width: 600px) { .event-detail-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <nav class="navbar" id="navbar"></nav>
+  <div class="page-wrapper">
+    <div class="page-banner">
+      <div class="page-banner-bg" style="background-image:url('/bkimg?p=1/1b/BK_CD_Naga_2.jpg');background-color:#1a0030;"></div>
+      <div class="page-banner-overlay"></div>
+      <div class="ambient-video-wrap" id="page-ambient-video"></div>
+      <div class="page-banner-content">
+        <h1 class="page-banner-title">🏆 <span style="color:var(--haos)">אירועים</span> וטורנירים</h1>
+        <p class="page-banner-subtitle">הצטרף לטורנירים ואירועי בקוגן ברחבי ישראל</p>
+      </div>
+    </div>
+
+  <!-- Scrolling strip -->
+  <div class="bk-deco-strip">
+              <div class="bk-deco-strip-inner">
+      <img src="/bkimg?p=f/f7/Bakugan_Dan.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=c/cc/Image3.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=c/c4/BK_CD_Skyress.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=6/66/ShunCN.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=1/1b/BK_CD_Naga_2.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=7/78/S1Masquerade.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=d/d3/Viper_helios.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=7/72/SpectraPh.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=5/5b/Image29.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=4/40/Image28.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=d/de/BK_Linehalt.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=7/78/Jakex.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=9/95/Fabia_sheen.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=d/db/BarodiusGI.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=3/3b/Kazarina_GI.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=9/9f/Bak_magmel_174x252.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=5/5c/Bak_anubias_174x252.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=d/d4/Dan_in_Mechtanium_Surge.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=c/c3/AliceTransparentSmall.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=c/c3/Julie.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=9/9c/Marucho_2.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=b/b5/Ren_GI.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=0/06/Image22.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=9/9f/Image18.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=6/6d/Image26.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=3/39/Nurzak_GI.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=7/74/Stoica_GI.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=6/64/Gil.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=3/38/Hal-G.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=d/d3/BK_CD_HMAlphaHydranoid.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=c/cf/BK_CD_Gorem.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=1/11/Bk_cd_percival.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=1/17/BK_CD_Ingram.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=5/58/BK_CD_Tigrerra.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=0/0a/Chara_hydron.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=2/28/Wilda_S2PosterImage.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=1/1f/BK_CD_Nemus.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=c/c6/BC_Dharak.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=c/c8/BC_Lumagrowl.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=d/dc/BK_Krakix.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=e/ee/BK_Aranaut.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=f/f7/Bakugan_Dan.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=c/cc/Image3.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=c/c4/BK_CD_Skyress.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=6/66/ShunCN.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=1/1b/BK_CD_Naga_2.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=7/78/S1Masquerade.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=d/d3/Viper_helios.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=7/72/SpectraPh.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=5/5b/Image29.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=4/40/Image28.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=d/de/BK_Linehalt.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=7/78/Jakex.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=9/95/Fabia_sheen.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=d/db/BarodiusGI.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=3/3b/Kazarina_GI.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=9/9f/Bak_magmel_174x252.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=5/5c/Bak_anubias_174x252.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=d/d4/Dan_in_Mechtanium_Surge.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=c/c3/AliceTransparentSmall.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=c/c3/Julie.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=9/9c/Marucho_2.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=b/b5/Ren_GI.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=0/06/Image22.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=9/9f/Image18.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=6/6d/Image26.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=3/39/Nurzak_GI.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=7/74/Stoica_GI.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=6/64/Gil.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=3/38/Hal-G.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=d/d3/BK_CD_HMAlphaHydranoid.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=c/cf/BK_CD_Gorem.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=1/11/Bk_cd_percival.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=1/17/BK_CD_Ingram.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=5/58/BK_CD_Tigrerra.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=0/0a/Chara_hydron.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=2/28/Wilda_S2PosterImage.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=1/1f/BK_CD_Nemus.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=c/c6/BC_Dharak.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=c/c8/BC_Lumagrowl.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=d/dc/BK_Krakix.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=e/ee/BK_Aranaut.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      </div>
+  </div>
+
+    <div class="container section-sm">
+      <div class="flex items-center justify-between mb-3" style="flex-wrap:wrap;gap:1rem">
+        <div class="events-filters">
+          <div class="filter-btn active" data-filter="all">הכל</div>
+          <div class="filter-btn" data-filter="upcoming">קרובים</div>
+          <div class="filter-btn" data-filter="ongoing">בתהליך</div>
+          <div class="filter-btn" data-filter="completed">הסתיימו</div>
+        </div>
+        <button class="btn btn-sm btn-primary hidden" id="add-event-btn" onclick="openModal('create-event-modal')">+ אירוע חדש</button>
+      </div>
+      <div id="events-grid" class="events-grid"><div class="spinner"></div></div>
+    </div>
+  </div>
+
+  <!-- Event Detail Modal -->
+  <div class="modal-overlay" id="event-detail-modal">
+    <div class="modal" style="max-width:680px">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-event-title">פרטי אירוע</h3>
+        <button class="modal-close" onclick="closeModal('event-detail-modal')">✕</button>
+      </div>
+      <div class="modal-body" id="modal-event-body"></div>
+    </div>
+  </div>
+
+  <!-- Apply Modal -->
+  <div class="modal-overlay" id="apply-modal">
+    <div class="modal" style="max-width:460px">
+      <div class="modal-header">
+        <h3 class="modal-title">📝 הרשמה לאירוע</h3>
+        <button class="modal-close" onclick="closeModal('apply-modal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <p id="apply-event-name" class="apply-modal-event-title"></p>
+        <div class="form-group">
+          <label class="form-label">שמך המלא <span style="color:var(--accent)">*</span></label>
+          <input type="text" id="apply-name" class="form-input" placeholder="שם מלא...">
+        </div>
+        <div class="form-group">
+          <label class="form-label">האם תגיע?</label>
+          <select id="apply-coming" class="form-input">
+            <option value="1">כן, אגיע! 🎮</option>
+            <option value="0">לא בטוח / לא אגיע</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">הערות (אופציונלי)</label>
+          <input type="text" id="apply-notes" class="form-input" placeholder="הערות נוספות...">
+        </div>
+        <div id="apply-error" class="form-error hidden"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('apply-modal')">ביטול</button>
+        <button class="btn btn-primary" onclick="submitApply()">הרשם לאירוע 🏆</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Event Modal (admin) -->
+  <div class="modal-overlay" id="create-event-modal">
+    <div class="modal" style="max-width:560px">
+      <div class="modal-header">
+        <h3 class="modal-title">➕ יצירת אירוע חדש</h3>
+        <button class="modal-close" onclick="closeModal('create-event-modal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group"><label class="form-label">שם האירוע</label><input id="ev-title" class="form-input" placeholder="טורניר..."></div>
+        <div class="form-group"><label class="form-label">תיאור</label><textarea id="ev-desc" class="form-input" rows="3" placeholder="תיאור האירוע..."></textarea></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+          <div class="form-group"><label class="form-label">תאריך ושעה</label><input type="datetime-local" id="ev-date" class="form-input"></div>
+          <div class="form-group"><label class="form-label">מקום</label><input id="ev-location" class="form-input" placeholder="עיר / כתובת..."></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+          <div class="form-group"><label class="form-label">מספר משתתפים מקס</label><input type="number" id="ev-max" class="form-input" placeholder="0 = ללא הגבלה" min="0"></div>
+          <div class="form-group"><label class="form-label">סוג אירוע</label>
+            <select id="ev-type" class="form-input">
+              <option value="tournament">טורניר</option>
+              <option value="casual">משחק ידידותי</option>
+              <option value="league">ליגה</option>
+              <option value="exhibition">תערוכה</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group"><label class="form-label">פרס 🏆</label><input id="ev-prize" class="form-input" placeholder="פרס / כרטיסים..."></div>
+        <div id="create-ev-error" class="form-error hidden"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('create-event-modal')">ביטול</button>
+        <button class="btn btn-primary" onclick="createEvent()">צור אירוע</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer"><div class="container"><div class="footer-bottom"><p>© 2026 בקוגן ישראל</p></div></div></footer>
+
+  <script src="/js/main.js"></script>
+  <script src="/js/events.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const wrap = document.getElementById('page-ambient-video');
+      if (wrap) {
+        const vid = 'Fm0cIfRWe7I';
+        wrap.innerHTML = `<iframe src="https://www.youtube.com/embed/${vid}?autoplay=1&mute=1&loop=1&playlist=${vid}&controls=0&disablekb=1&showinfo=0&rel=0&modestbranding=1" allow="autoplay" allowfullscreen frameborder="0"></iframe>`;
+      }
+    });
+  </script>
+</body>
+</html>

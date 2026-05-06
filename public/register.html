@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>הרשמה – בקוגן ישראל</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <nav class="navbar" id="navbar"></nav>
+  <div class="auth-page">
+    <div class="auth-card" style="max-width:480px">
+      <div class="auth-logo">
+        <div class="ball">🌀</div>
+        <h1 class="auth-title">הצטרף לקהילה!</h1>
+        <p class="auth-subtitle">צור חשבון ותהיה חלק מבקוגן ישראל</p>
+      </div>
+
+      <form id="register-form">
+        <div class="form-group">
+          <label class="form-label" for="username">שם משתמש <span>*</span></label>
+          <input type="text" id="username" class="form-input" placeholder="DanKuso2026" required minlength="3" maxlength="30">
+          <div class="text-muted text-sm mt-1">לפחות 3 תווים, ללא רווחים</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="email">אימייל <span>*</span></label>
+          <input type="email" id="email" class="form-input" placeholder="your@email.com" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="password">סיסמה <span>*</span></label>
+          <input type="password" id="password" class="form-input" placeholder="לפחות 6 תווים" required minlength="6">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="password2">אישור סיסמה <span>*</span></label>
+          <input type="password" id="password2" class="form-input" placeholder="חזור על הסיסמה" required>
+        </div>
+        <div id="error-msg" class="form-error hidden"></div>
+        <button type="submit" class="btn btn-primary w-full mt-2" id="submit-btn">הרשמה ✨</button>
+      </form>
+
+      <div class="form-divider">כבר יש לך חשבון?</div>
+      <a href="/login" class="btn btn-secondary w-full">כניסה לחשבון קיים</a>
+
+      <p style="text-align:center;color:var(--text-muted);font-size:0.8rem;margin-top:1rem">
+        בהרשמה אתה מסכים לכללי הקהילה שלנו
+      </p>
+    </div>
+  </div>
+
+  <script src="/js/main.js"></script>
+  <script>
+    if (Auth.isLoggedIn()) window.location.href = '/';
+
+    document.getElementById('register-form').addEventListener('submit', async e => {
+      e.preventDefault();
+      const btn = document.getElementById('submit-btn');
+      const errEl = document.getElementById('error-msg');
+      errEl.classList.add('hidden');
+
+      const username = document.getElementById('username').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const password2 = document.getElementById('password2').value;
+
+      if (password !== password2) {
+        errEl.textContent = '⚠️ הסיסמאות אינן תואמות';
+        errEl.classList.remove('hidden'); return;
+      }
+      if (/\s/.test(username)) {
+        errEl.textContent = '⚠️ שם משתמש לא יכול להכיל רווחים';
+        errEl.classList.remove('hidden'); return;
+      }
+
+      btn.disabled = true; btn.textContent = 'נרשם...';
+      try {
+        const data = await apiFetch('/auth/register', {
+          method: 'POST',
+          body: { username, email, password }
+        });
+        Auth.setAuth(data.token, data.user);
+        showToast('ברוך הבא לבקוגן ישראל! 🎉', 'success');
+        setTimeout(() => window.location.href = '/', 800);
+      } catch(err) {
+        errEl.textContent = '⚠️ ' + err.message;
+        errEl.classList.remove('hidden');
+        btn.disabled = false; btn.textContent = 'הרשמה ✨';
+      }
+    });
+  </script>
+</body>
+</html>

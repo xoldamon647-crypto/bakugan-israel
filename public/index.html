@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>בקוגן ישראל – קהילת הבקוגן הישראלית</title>
+  <meta name="description" content="הקהילה הישראלית של בקוגן – פורומים, אירועים, ויקי, חוקים ועוד!">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .latest-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+    .section-inner{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.3rem}
+    .section-inner-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+    .section-inner-title{font-size:0.95rem;font-weight:800;display:flex;align-items:center;gap:0.4rem;font-family:'Orbitron',sans-serif;letter-spacing:0.03em}
+    .latest-thread{padding:0.65rem 0;border-bottom:1px solid var(--border);display:flex;gap:0.65rem;cursor:pointer}
+    .latest-thread:last-child{border-bottom:none}
+    .latest-thread:hover .lt-title{color:var(--accent)}
+    .lt-icon{width:34px;height:34px;background:rgba(255,102,0,0.1);border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1rem}
+    .lt-info{flex:1;min-width:0}
+    .lt-title{font-size:0.86rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:0.1rem;transition:color 0.2s}
+    .lt-meta{font-size:0.74rem;color:var(--text-secondary)}
+
+    /* ── char cards ── */
+    .chars-section{padding:5rem 0;background:var(--bg-secondary)}
+    .chars-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1.1rem}
+    .char-card-img{
+      width:100%;height:220px;object-fit:cover;object-position:top center;
+      background:linear-gradient(135deg,#1a0500,#3a1000);
+      display:block;transition:transform 0.4s ease;
+    }
+    .char-card:hover .char-card-img{transform:scale(1.06)}
+    .char-img-wrap{overflow:hidden;height:220px;position:relative}
+    .char-img-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 50%,rgba(6,6,16,0.9) 100%)}
+
+    /* ── attribute cards with real background ── */
+    .attr-img-bg{
+      width:100%;height:180px;object-fit:cover;object-position:center;
+      border-radius:var(--radius) var(--radius) 0 0;
+      margin-bottom:1rem;
+      display:block;
+    }
+    .attr-card-v2{
+      border-radius:var(--radius-lg);padding-bottom:1.5rem;
+      text-align:center;border:1px solid;
+      transition:var(--tr);
+      position:relative;overflow:hidden;
+      padding:0;
+    }
+    .attr-card-v2:hover{transform:translateY(-6px)}
+    .attr-card-v2 .attr-body{padding:0 1.2rem 1.2rem}
+    .attr-card-v2 .attr-name{font-family:'Orbitron',sans-serif;font-size:0.92rem;font-weight:900;margin-bottom:0.3rem;letter-spacing:0.05em}
+    .attr-card-v2 .attr-desc{font-size:0.8rem;color:var(--text-secondary);line-height:1.6}
+    .attr-card-v2 .attr-power{font-family:'Orbitron',sans-serif;font-size:0.68rem;letter-spacing:0.1em;margin-top:0.65rem;opacity:0.55}
+
+    /* season panels with bg image */
+    .season-panel-bg{
+      position:absolute;inset:0;
+      background-size:cover;background-position:center top;
+      filter:brightness(0.4);
+      transition:filter 0.4s ease;
+    }
+    .season-panel:hover .season-panel-bg{filter:brightness(0.55)}
+
+    .cta-box{text-align:center;padding:3rem;background:linear-gradient(135deg,rgba(255,102,0,0.1),rgba(155,0,255,0.1));border:1px solid var(--border-accent);border-radius:var(--radius-lg)}
+    @media(max-width:768px){.latest-grid{grid-template-columns:1fr}.chars-grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:480px){.chars-grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <nav class="navbar" id="navbar"></nav>
+
+  <!-- ══ HERO with YouTube opening ══ -->
+  <section class="hero">
+    <div class="video-bg" id="video-bg">
+      <div class="hero-bg-fallback"></div>
+    </div>
+    <div class="energy-rings" id="energy-rings"></div>
+    <div class="bakugan-particles" id="particles"></div>
+    <div class="video-overlay"></div>
+
+    <!-- floating character art in hero -->
+    <img class="hero-char-deco hero-char-left"
+      src="/bkimg?p=f/f7/Bakugan_Dan.png"
+      onerror="this.src='/bkimg?p=6/6d/Dan_large.png';this.onerror=null"
+      alt="" loading="lazy">
+    <img class="hero-char-deco hero-char-right"
+      src="/bkimg?p=f/fb/Fusion_Dragonoid_Appears.jpg"
+      onerror="this.style.display='none'" alt="" loading="lazy">
+
+    <div class="hero-content">
+      <div class="hero-badge">🌀 BAKUGAN ISRAEL COMMUNITY</div>
+      <h1 class="hero-title">בקוגן<br>ישראל</h1>
+      <p class="hero-subtitle">הצטרף לקהילה הגדולה של שחקני בקוגן בישראל<br>פורומים · טורנירים · ויקי · חוקים</p>
+      <div class="hero-buttons">
+        <a href="/register" class="btn btn-primary btn-lg">הצטרף עכשיו ✨</a>
+        <a href="/forums" class="btn btn-secondary btn-lg">לפורום 💬</a>
+        <a href="/events" class="btn btn-outline btn-lg">אירועים 🏆</a>
+      </div>
+    </div>
+
+    <div class="hero-stats">
+      <div class="hero-stat"><span class="hero-stat-num" id="stat-users">–</span><span class="hero-stat-label">MEMBERS</span></div>
+      <div class="hero-stat"><span class="hero-stat-num" id="stat-threads">–</span><span class="hero-stat-label">THREADS</span></div>
+      <div class="hero-stat"><span class="hero-stat-num" id="stat-events">–</span><span class="hero-stat-label">EVENTS</span></div>
+    </div>
+
+    <button class="sound-toggle" id="sound-btn" title="הפעל/כבה צליל">🔇</button>
+  </section>
+
+  <!-- ══ SCROLLING BAKUGAN STRIP ══ -->
+  <div class="bk-deco-strip">
+              <div class="bk-deco-strip-inner">
+      <img src="/bkimg?p=f/f7/Bakugan_Dan.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=c/cc/Image3.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=c/c4/BK_CD_Skyress.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=6/66/ShunCN.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=1/1b/BK_CD_Naga_2.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=7/78/S1Masquerade.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=d/d3/Viper_helios.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=7/72/SpectraPh.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=5/5b/Image29.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=4/40/Image28.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=d/de/BK_Linehalt.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=7/78/Jakex.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=9/95/Fabia_sheen.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=d/db/BarodiusGI.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=3/3b/Kazarina_GI.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=9/9f/Bak_magmel_174x252.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=5/5c/Bak_anubias_174x252.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=d/d4/Dan_in_Mechtanium_Surge.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=c/c3/AliceTransparentSmall.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=c/c3/Julie.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=9/9c/Marucho_2.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=b/b5/Ren_GI.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=0/06/Image22.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=9/9f/Image18.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=6/6d/Image26.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=3/39/Nurzak_GI.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=7/74/Stoica_GI.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=6/64/Gil.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=3/38/Hal-G.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=d/d3/BK_CD_HMAlphaHydranoid.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=c/cf/BK_CD_Gorem.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=1/11/Bk_cd_percival.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=1/17/BK_CD_Ingram.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=5/58/BK_CD_Tigrerra.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=0/0a/Chara_hydron.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=2/28/Wilda_S2PosterImage.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=1/1f/BK_CD_Nemus.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=c/c6/BC_Dharak.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=c/c8/BC_Lumagrowl.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=d/dc/BK_Krakix.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=e/ee/BK_Aranaut.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=f/f7/Bakugan_Dan.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=c/cc/Image3.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=c/c4/BK_CD_Skyress.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=6/66/ShunCN.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=1/1b/BK_CD_Naga_2.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=7/78/S1Masquerade.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=d/d3/Viper_helios.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=7/72/SpectraPh.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=5/5b/Image29.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=4/40/Image28.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=d/de/BK_Linehalt.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=7/78/Jakex.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=9/95/Fabia_sheen.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=d/db/BarodiusGI.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=3/3b/Kazarina_GI.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=9/9f/Bak_magmel_174x252.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=5/5c/Bak_anubias_174x252.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=d/d4/Dan_in_Mechtanium_Surge.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=c/c3/AliceTransparentSmall.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=c/c3/Julie.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=9/9c/Marucho_2.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=b/b5/Ren_GI.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=0/06/Image22.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=9/9f/Image18.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=6/6d/Image26.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=3/39/Nurzak_GI.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=7/74/Stoica_GI.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=6/64/Gil.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=3/38/Hal-G.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=d/d3/BK_CD_HMAlphaHydranoid.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=c/cf/BK_CD_Gorem.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=1/11/Bk_cd_percival.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=1/17/BK_CD_Ingram.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=5/58/BK_CD_Tigrerra.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=0/0a/Chara_hydron.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=2/28/Wilda_S2PosterImage.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=1/1f/BK_CD_Nemus.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=c/c6/BC_Dharak.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=c/c8/BC_Lumagrowl.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=d/dc/BK_Krakix.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=e/ee/BK_Aranaut.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      </div>
+  </div>
+
+  <!-- ══ QUICK ACTIONS ══ -->
+  <section class="latest-grid section">
+    <div class="section-inner">
+      <div class="section-inner-header">
+        <div class="section-inner-title">⚡ פעילות אחרונה</div>
+        <a href="/forums" class="btn btn-sm btn-secondary">לפורום ←</a>
+      </div>
+      <div id="recent-threads" class="recent-threads">
+        <div class="spinner"></div>
+      </div>
+    </div>
+
+    <div class="section-inner">
+      <div class="section-inner-header">
+        <div class="section-inner-title">🏆 אירועים קרובים</div>
+        <a href="/events" class="btn btn-sm btn-secondary">לכל האירועים ←</a>
+      </div>
+      <div id="upcoming-events" class="upcoming-events">
+        <div class="spinner"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ ATTRIBUTES with real Bakugan images ══ -->
+  <section class="section" style="background:var(--bg-secondary);position:relative;overflow:hidden">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-label">Bakugan Attributes</span>
+        <h2 class="section-title">שש <span>תכונות הבקוגן</span></h2>
+        <p class="section-desc">כל בקוגן שייך לאחת משש התכונות – כל אחת עם כוח ייחודי משלה</p>
+      </div>
+      <div class="attrs-grid">
+
+        <!-- PYRUS - Drago -->
+        <div class="attr-card-v2 attr-pyrus-card">
+          <img class="attr-img-bg"
+            src="/bkimg?p=f/fb/Fusion_Dragonoid_Appears.jpg"
+            onerror="this.style.display='none'"
+            alt="Drago Pyrus" loading="lazy">
+          <div class="attr-body">
+            <div class="bk-ball bk-ball-pyrus" style="width:70px;height:70px;margin:0 auto 0.75rem">
+              <div class="bk-ball-crack"></div>
+            </div>
+            <div class="attr-name" style="color:#FF4500">🔥 PYRUS – אש</div>
+            <div class="attr-desc">בקוגן אש תוקפניים. Drago של דן קוסו הוא הסמל של Pyrus – דרגון אש עם נשמה של לוחם.</div>
+            <div class="attr-power">G-POWER: 640 → 1300+</div>
+          </div>
+        </div>
+
+        <!-- AQUOS - Preyas -->
+        <div class="attr-card-v2 attr-aquos-card">
+          <img class="attr-img-bg"
+            src="/bkimg?p=6/66/BK_CD_Preyas.jpg"
+            onerror="this.style.display='none'"
+            alt="Preyas Aquos" loading="lazy">
+          <div class="attr-body">
+            <div class="bk-ball bk-ball-aquos" style="width:70px;height:70px;margin:0 auto 0.75rem">
+              <div class="bk-ball-crack"></div>
+            </div>
+            <div class="attr-name" style="color:#0088FF">💧 AQUOS – מים</div>
+            <div class="attr-desc">בקוגן מים אסטרטגיים. Preyas של מרוסה ידוע ביכולת שינוי האלמנט הייחודית שלו.</div>
+            <div class="attr-power">G-POWER: 490 → 900</div>
+          </div>
+        </div>
+
+        <!-- DARKUS - Hydranoid -->
+        <div class="attr-card-v2 attr-darkus-card">
+          <img class="attr-img-bg"
+            src="/bkimg?p=b/b4/5f0f7d9d094ff107_bk_hydranoid.png"
+            onerror="this.style.display='none'"
+            alt="Hydranoid Darkus" loading="lazy">
+          <div class="attr-body">
+            <div class="bk-ball bk-ball-darkus" style="width:70px;height:70px;margin:0 auto 0.75rem">
+              <div class="bk-ball-crack"></div>
+            </div>
+            <div class="attr-name" style="color:#9B00FF">🌑 DARKUS – חשכה</div>
+            <div class="attr-desc">בקוגן האפלה עוצמתיים. Hydranoid האפל הפך ל-Alpha Hydranoid – ההידרה השלוש-ראשתית.</div>
+            <div class="attr-power">G-POWER: 600 → 1100</div>
+          </div>
+        </div>
+
+        <!-- HAOS - Tigrerra -->
+        <div class="attr-card-v2 attr-haos-card">
+          <img class="attr-img-bg"
+            src="/bkimg?p=5/58/BK_CD_Tigrerra.jpg"
+            onerror="this.style.display='none'"
+            alt="Tigrerra Haos" loading="lazy">
+          <div class="attr-body">
+            <div class="bk-ball bk-ball-haos" style="width:70px;height:70px;margin:0 auto 0.75rem">
+              <div class="bk-ball-crack"></div>
+            </div>
+            <div class="attr-name" style="color:#FFD700">✨ HAOS – אור</div>
+            <div class="attr-desc">בקוגן אור מבריקים. Tigrerra של ראונו – חתולת האור שהפכה ל-Blade Tigrerra עם להבים.</div>
+            <div class="attr-power">G-POWER: 450 → 1000</div>
+          </div>
+        </div>
+
+        <!-- VENTUS - Skyress -->
+        <div class="attr-card-v2 attr-ventus-card">
+          <img class="attr-img-bg"
+            src="/bkimg?p=c/c4/BK_CD_Skyress.jpg"
+            onerror="this.style.display='none'"
+            alt="Skyress Ventus" loading="lazy">
+          <div class="attr-body">
+            <div class="bk-ball bk-ball-ventus" style="width:70px;height:70px;margin:0 auto 0.75rem">
+              <div class="bk-ball-crack"></div>
+            </div>
+            <div class="attr-name" style="color:#00CC44">🌪️ VENTUS – רוח</div>
+            <div class="attr-desc">בקוגן רוח מהירים. Skyress של שון – ציפור הרוח שטסה מהר מכדי שאפשר לראות.</div>
+            <div class="attr-power">G-POWER: 510 → 1050</div>
+          </div>
+        </div>
+
+        <!-- SUBTERRA - Gorem -->
+        <div class="attr-card-v2 attr-subterra-card">
+          <img class="attr-img-bg"
+            src="/bkimg?p=c/cf/BK_CD_Gorem.jpg"
+            onerror="this.style.display='none'"
+            alt="Gorem Subterra" loading="lazy">
+          <div class="attr-body">
+            <div class="bk-ball bk-ball-subterra" style="width:70px;height:70px;margin:0 auto 0.75rem">
+              <div class="bk-ball-crack"></div>
+            </div>
+            <div class="attr-name" style="color:#CC6600">🪨 SUBTERRA – אדמה</div>
+            <div class="attr-desc">בקוגן אדמה עמידים. Gorem ו-Stone Gorem של שון וג'ולי – כמו סלע שאי אפשר לשבור.</div>
+            <div class="attr-power">G-POWER: 600 → 1000</div>
+          </div>
+        </div>
+
+      </div>
+      <img class="section-char-peek right"
+        src="/bkimg?p=f/fb/Fusion_Dragonoid_Appears.jpg"
+        onerror="this.style.display='none'" alt="" loading="lazy">
+    </div>
+  </section>
+
+  <!-- ══ CHARACTERS with real anime images ══ -->
+  <section class="chars-section" style="position:relative;overflow:hidden">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-label">Battle Brawlers</span>
+        <h2 class="section-title">ה<span>לוחמים</span> הראשיים</h2>
+        <p class="section-desc">הגיבורים ואת הבקוגן שלהם – ישירות מהאנימה</p>
+      </div>
+      <img class="section-char-peek left"
+        src="/bkimg?p=7/72/SpectraPh.png"
+        onerror="this.style.display='none'" alt="" loading="lazy">
+      <img class="section-char-peek right"
+        src="/bkimg?p=d/de/Battle_Brawlers.jpg"
+        onerror="this.style.display='none'" alt="" loading="lazy" style="height:300px">
+      <div class="chars-grid" style="position:relative;z-index:1">
+
+        <!-- Dan Kuso -->
+        <div class="char-card">
+          <div class="char-img-wrap">
+            <img class="char-card-img"
+              src="/bkimg?p=f/f7/Bakugan_Dan.png"
+              onerror="this.src='/bkimg?p=6/6d/Dan_large.png';this.onerror=function(){this.src='';this.parentElement.style.background='linear-gradient(135deg,#1a0500,#3a1000)'}"
+              alt="Dan Kuso" loading="lazy">
+            <div class="char-img-overlay"></div>
+          </div>
+          <div class="char-body">
+            <div class="char-bakugan">PYRUS · DRAGONOID</div>
+            <div class="char-name">דן קוסו</div>
+            <div class="char-desc">הגיבור הראשי – אומץ לב ונחישות. Drago האש הוא הבקוגן השומר שלו.</div>
+            <div class="char-stat">
+              <span class="gpower" style="color:#FF4500">Drago G: 640→1300+</span>
+              <span style="font-size:0.72rem;color:var(--text-muted)">S1</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Runo - Tigrerra -->
+        <div class="char-card">
+          <div class="char-img-wrap">
+            <img class="char-card-img"
+              src="/bkimg?p=6/6b/00.jpg"
+              onerror="this.src='';this.parentElement.style.background='linear-gradient(135deg,#1a1500,#3a3000)'"
+              alt="Runo" loading="lazy">
+            <div class="char-img-overlay"></div>
+          </div>
+          <div class="char-body">
+            <div class="char-bakugan" style="color:#FFD700">HAOS · TIGRERRA</div>
+            <div class="char-name">ראונו מיסאקי</div>
+            <div class="char-desc">חברה קרובה של דן. Tigrerra, חתולת ה-Haos, הפכה ל-Blade Tigrerra.</div>
+            <div class="char-stat">
+              <span class="gpower" style="color:#FFD700">Tigrerra G: 450→1000</span>
+              <span style="font-size:0.72rem;color:var(--text-muted)">S1</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Shun - Skyress -->
+        <div class="char-card">
+          <div class="char-img-wrap">
+            <img class="char-card-img"
+              src="/bkimg?p=6/66/ShunCN.png"
+              onerror="this.src='';this.parentElement.style.background='linear-gradient(135deg,#001a00,#004400)'"
+              alt="Shun" loading="lazy">
+            <div class="char-img-overlay"></div>
+          </div>
+          <div class="char-body">
+            <div class="char-bakugan" style="color:#00CC44">VENTUS · SKYRESS</div>
+            <div class="char-name">שון קאזאמי</div>
+            <div class="char-desc">נינג'ה שקט ואסטרטגי. Skyress, ציפור הרוח, מהירה מכדי שאפשר לראות.</div>
+            <div class="char-stat">
+              <span class="gpower" style="color:#00CC44">Skyress G: 510→1050</span>
+              <span style="font-size:0.72rem;color:var(--text-muted)">S1</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hydranoid - Alice/Masquerade -->
+        <div class="char-card">
+          <div class="char-img-wrap">
+            <img class="char-card-img"
+              src="/bkimg?p=b/b4/5f0f7d9d094ff107_bk_hydranoid.png"
+              onerror="this.src='';this.parentElement.style.background='linear-gradient(135deg,#120028,#350070)'"
+              alt="Hydranoid" loading="lazy" style="object-position:center">
+            <div class="char-img-overlay"></div>
+          </div>
+          <div class="char-body">
+            <div class="char-bakugan" style="color:#9B00FF">DARKUS · HYDRANOID</div>
+            <div class="char-name">אליס / Masquerade</div>
+            <div class="char-desc">המסתורית של הקבוצה. Alpha Hydranoid – ההידרה השלוש-ראשתית של האפלה.</div>
+            <div class="char-stat">
+              <span class="gpower" style="color:#9B00FF">G: 600→1100</span>
+              <span style="font-size:0.72rem;color:var(--text-muted)">S1</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Gorem -->
+        <div class="char-card">
+          <div class="char-img-wrap">
+            <img class="char-card-img"
+              src="/bkimg?p=c/cf/BK_CD_Gorem.jpg"
+              onerror="this.src='';this.parentElement.style.background='linear-gradient(135deg,#1a0800,#442000)'"
+              alt="Gorem" loading="lazy">
+            <div class="char-img-overlay"></div>
+          </div>
+          <div class="char-body">
+            <div class="char-bakugan" style="color:#CC6600">SUBTERRA · GOREM</div>
+            <div class="char-name">שון / ג'ולי – Gorem</div>
+            <div class="char-desc">Stone Gorem – ענק האדמה. הבקוגן הכי עמיד ועצמתי מבחינה פיזית.</div>
+            <div class="char-stat">
+              <span class="gpower" style="color:#CC6600">G: 600→1000</span>
+              <span style="font-size:0.72rem;color:var(--text-muted)">S1</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Naga - Villain -->
+        <div class="char-card">
+          <div class="char-img-wrap">
+            <img class="char-card-img"
+              src="/bkimg?p=1/1b/BK_CD_Naga_2.jpg"
+              onerror="this.src='';this.parentElement.style.background='linear-gradient(135deg,#1a1500,#444400)'"
+              alt="Naga" loading="lazy">
+            <div class="char-img-overlay"></div>
+          </div>
+          <div class="char-body">
+            <div class="char-bakugan" style="color:#FFD700">HAOS · NAGA 🦹</div>
+            <div class="char-name">Naga – האנטגוניסט</div>
+            <div class="char-desc">בקוגן Haos שנפל לאפלה. שואף לגנוב את Silent Core ולשלוט בשני העולמות.</div>
+            <div class="char-stat">
+              <span class="gpower" style="color:#FFD700">G: UNLIMITED</span>
+              <span style="font-size:0.72rem;color:var(--text-muted)">S1 Boss</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Season 2: Helios -->
+        <div class="char-card">
+          <div class="char-img-wrap">
+            <img class="char-card-img"
+              src="/bkimg?p=d/d3/Viper_helios.png"
+              onerror="this.src='';this.parentElement.style.background='linear-gradient(135deg,#1a0500,#5a1500)'"
+              alt="Helios" loading="lazy">
+            <div class="char-img-overlay"></div>
+          </div>
+          <div class="char-body">
+            <div class="char-bakugan" style="color:#FF4500">PYRUS · HELIOS ⚔️</div>
+            <div class="char-name">Helios – יריב דרגו</div>
+            <div class="char-desc">Viper Helios של Spectra Phantom – הבקוגן הקיברנטי החזק ביותר של ה-Vexos.</div>
+            <div class="char-stat">
+              <span class="gpower" style="color:#FF4500">G: 900→1600</span>
+              <span style="font-size:0.72rem;color:var(--text-muted)">S2</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Preyas -->
+        <div class="char-card">
+          <div class="char-img-wrap">
+            <img class="char-card-img"
+              src="/bkimg?p=6/66/BK_CD_Preyas.jpg"
+              onerror="this.src='';this.parentElement.style.background='linear-gradient(135deg,#001228,#003366)'"
+              alt="Preyas" loading="lazy">
+            <div class="char-img-overlay"></div>
+          </div>
+          <div class="char-body">
+            <div class="char-bakugan" style="color:#0088FF">AQUOS · PREYAS</div>
+            <div class="char-name">Preyas – של מרוסה</div>
+            <div class="char-desc">הבקוגן הייחודי שמשנה אלמנטים. Preyas Angelo/Diablo – שני הצדדים הטוב והרע.</div>
+            <div class="char-stat">
+              <span class="gpower" style="color:#0088FF">G: 490→900</span>
+              <span style="font-size:0.72rem;color:var(--text-muted)">S1</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ SEASONS with anime bg ══ -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-label">Anime Series</span>
+        <h2 class="section-title">ארבע <span>עונות</span> אגדיות</h2>
+      </div>
+
+      <div class="season-row">
+        <div class="season-panel sp-s1">
+          <div class="season-panel-bg" style="background-image:url('/bkimg?p=f/fb/Fusion_Dragonoid_Appears.jpg')"></div>
+          <div class="sp-glow"></div>
+          <div class="season-panel-emoji">🔥</div>
+        </div>
+        <div class="season-text">
+          <div class="season-num-tag">SEASON 01 · 2007</div>
+          <div class="season-title-big">Battle Brawlers</div>
+          <p class="season-desc-text">דן קוסו מגלה שהבקוגן הם יצורים חיים! הוא ועמיתיו חייבים להציל את שני העולמות מ-Naga שמנסה לגנוב את Silent Core ואת Silent Infinity Core.</p>
+          <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap">
+            <a href="/wiki?page=season-1" class="btn btn-outline">קרא עוד ←</a>
+            <a href="/wiki?page=char-dan" class="btn btn-sm btn-secondary">דן 🔥</a>
+            <a href="/wiki?page=char-drago" class="btn btn-sm btn-secondary">Drago 🐉</a>
+            <a href="/wiki?page=char-naga" class="btn btn-sm btn-secondary">Naga 💀</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="season-row reverse">
+        <div class="season-panel sp-s2">
+          <div class="season-panel-bg" style="background-image:url('/bkimg?p=d/d3/Viper_helios.png')"></div>
+          <div class="sp-glow"></div>
+          <div class="season-panel-emoji">💧</div>
+        </div>
+        <div class="season-text">
+          <div class="season-num-tag">SEASON 02 · 2009</div>
+          <div class="season-title-big">New Vestroia</div>
+          <p class="season-desc-text">ה-Vexos השתלטו על Vestroia החדשה. דן וחבריו חוזרים כדי לשחרר את הבקוגן ולהפיל את המשטר הרשע בראשות Shadow Prove.</p>
+          <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap">
+            <a href="/wiki?page=season-2" class="btn btn-outline">קרא עוד ←</a>
+            <a href="/wiki?page=char-spectra" class="btn btn-sm btn-secondary">Spectra ⚔️</a>
+            <a href="/wiki?page=char-helios" class="btn btn-sm btn-secondary">Helios 🔥</a>
+            <a href="/wiki?page=char-ace" class="btn btn-sm btn-secondary">Ace 🌑</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="season-row">
+        <div class="season-panel sp-s3">
+          <div class="season-panel-bg" style="background-image:url('/bkimg?p=d/de/BK_Linehalt.png')"></div>
+          <div class="sp-glow"></div>
+          <div class="season-panel-emoji">⚡</div>
+        </div>
+        <div class="season-text">
+          <div class="season-num-tag">SEASON 03 · 2010</div>
+          <div class="season-title-big">Gundalian Invaders</div>
+          <p class="season-desc-text">פלישה מהכוכב גונדליה מאיימת על שלום הגלקסיה. ה-Battle Brawlers מגויסים שוב להגן על Neathia מפני כוחות גונדליה.</p>
+          <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap">
+            <a href="/wiki?page=season-3" class="btn btn-outline">קרא עוד ←</a>
+            <a href="/wiki?page=char-barodius" class="btn btn-sm btn-secondary">Barodius 🌑</a>
+            <a href="/wiki?page=char-ren" class="btn btn-sm btn-secondary">Ren ⚡</a>
+            <a href="/wiki?page=char-fabia" class="btn btn-sm btn-secondary">Fabia ✨</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="season-row reverse">
+        <div class="season-panel sp-s4">
+          <div class="season-panel-bg" style="background-image:url('/bkimg?p=d/d4/Dan_in_Mechtanium_Surge.png')"></div>
+          <div class="sp-glow"></div>
+          <div class="season-panel-emoji">⚙️</div>
+        </div>
+        <div class="season-text">
+          <div class="season-num-tag">SEASON 04 · 2011</div>
+          <div class="season-title-big">Mechtanium Surge</div>
+          <p class="season-desc-text">עידן ה-Mechtogan – ישויות ענק שנוצרות מכוח הבקוגן. Mag Mel מאיים על כדור הארץ בשעה שדן ו-Titanium Dragonoid מתמודדים עם הכוח הגדול ביותר.</p>
+          <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap">
+            <a href="/wiki?page=season-4" class="btn btn-outline">קרא עוד ←</a>
+            <a href="/wiki?page=char-magmel" class="btn btn-sm btn-secondary">Mag Mel 💀</a>
+            <a href="/wiki?page=char-anubias" class="btn btn-sm btn-secondary">Anubias 🌑</a>
+            <a href="/wiki?page=char-sellon" class="btn btn-sm btn-secondary">Sellon 💧</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ LATEST ACTIVITY ══ -->
+  <section class="section" style="background:var(--bg-secondary);padding:3.5rem 0">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-label">Community</span>
+        <h2 class="section-title">מה קורה <span>בקהילה</span>?</h2>
+      </div>
+      <div class="latest-grid">
+        <div class="section-inner">
+          <div class="section-inner-header">
+            <div class="section-inner-title">💬 שרשורים אחרונים</div>
+            <a href="/forums" class="btn btn-sm btn-outline">כל הפורום →</a>
+          </div>
+          <div id="latest-threads"><div class="spinner"></div></div>
+        </div>
+        <div class="section-inner">
+          <div class="section-inner-header">
+            <div class="section-inner-title">🏆 אירועים קרובים</div>
+            <a href="/events" class="btn btn-sm btn-outline">כל האירועים →</a>
+          </div>
+          <div id="latest-events"><div class="spinner"></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ CTA ══ -->
+  <section class="section" style="position:relative;overflow:hidden">
+    <img style="position:absolute;bottom:0;right:0;height:300px;width:auto;opacity:0.08;filter:saturate(0.3) brightness(2);pointer-events:none"
+      src="/bkimg?p=d/db/BarodiusGI.png" onerror="this.style.display='none'" alt="" loading="lazy">
+    <img style="position:absolute;bottom:0;left:0;height:300px;width:auto;opacity:0.08;filter:saturate(0.3) brightness(2);pointer-events:none;transform:scaleX(-1)"
+      src="/bkimg?p=9/9f/Bak_magmel_174x252.png" onerror="this.style.display='none'" alt="" loading="lazy">
+    <div class="container" style="position:relative;z-index:1">
+      <div class="cta-box" style="position:relative">
+        <div style="display:flex;justify-content:center;gap:1rem;margin-bottom:1rem;flex-wrap:wrap">
+          <img src="/bkimg?p=f/fb/Fusion_Dragonoid_Appears.jpg" onerror="this.style.display='none'" alt="" loading="lazy"
+            style="height:80px;width:auto;border-radius:50%;border:2px solid rgba(255,69,0,0.5);object-fit:cover">
+          <img src="/bkimg?p=c/c4/BK_CD_Skyress.jpg" onerror="this.style.display='none'" alt="" loading="lazy"
+            style="height:80px;width:auto;border-radius:50%;border:2px solid rgba(0,204,68,0.5);object-fit:cover">
+          <img src="/bkimg?p=d/d3/Viper_helios.png" onerror="this.style.display='none'" alt="" loading="lazy"
+            style="height:80px;width:auto;border-radius:50%;border:2px solid rgba(255,69,0,0.5);object-fit:cover">
+          <img src="/bkimg?p=d/de/BK_Linehalt.png" onerror="this.style.display='none'" alt="" loading="lazy"
+            style="height:80px;width:auto;border-radius:50%;border:2px solid rgba(155,0,255,0.5);object-fit:cover">
+          <img src="/bkimg?p=1/1b/BK_CD_Naga_2.jpg" onerror="this.style.display='none'" alt="" loading="lazy"
+            style="height:80px;width:auto;border-radius:50%;border:2px solid rgba(255,215,0,0.5);object-fit:cover">
+        </div>
+        <h2 class="section-title">הצטרף לקהילה!</h2>
+        <p style="color:var(--text-secondary);max-width:480px;margin:0 auto 1.75rem;font-size:0.95rem">הירשם עכשיו ותהיה חלק מקהילת הבקוגן הגדולה ביותר בישראל</p>
+        <div style="display:flex;gap:0.9rem;justify-content:center;flex-wrap:wrap">
+          <a href="/register" class="btn btn-primary btn-lg">הרשמה חינמית ✨</a>
+          <a href="/events" class="btn btn-secondary btn-lg">אירועים קרובים 🏆</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div style="display:flex;align-items:center;gap:0.65rem;margin-bottom:0.75rem">
+            <div class="nav-logo">🌀</div>
+            <div class="nav-title">בקוגן <span>ישראל</span></div>
+          </div>
+          <p>הקהילה הישראלית הרשמית של בקוגן. מקום לשחקנים, אספנים ואוהדי הסדרה.</p>
+        </div>
+        <div class="footer-links">
+          <h4>ניווט</h4>
+          <ul>
+            <li><a href="/forums">פורום</a></li>
+            <li><a href="/events">אירועים</a></li>
+            <li><a href="/wiki">ויקי</a></li>
+            <li><a href="/rules">חוקי משחק</a></li>
+          </ul>
+        </div>
+        <div class="footer-links">
+          <h4>חשבון</h4>
+          <ul>
+            <li><a href="/register">הרשמה</a></li>
+            <li><a href="/login">כניסה</a></li>
+            <li><a href="/profile">פרופיל</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2026 בקוגן ישראל</p>
+        <div class="attribute-dots">
+          <div class="attr-dot" style="background:#FF4500;box-shadow:0 0 6px #FF4500"></div>
+          <div class="attr-dot" style="background:#0088FF;box-shadow:0 0 6px #0088FF"></div>
+          <div class="attr-dot" style="background:#9B00FF;box-shadow:0 0 6px #9B00FF"></div>
+          <div class="attr-dot" style="background:#FFD700;box-shadow:0 0 6px #FFD700"></div>
+          <div class="attr-dot" style="background:#00CC44;box-shadow:0 0 6px #00CC44"></div>
+          <div class="attr-dot" style="background:#CC6600;box-shadow:0 0 6px #CC6600"></div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/main.js"></script>
+  <script>
+    const eventTypeEmojis = { tournament: '🏆', casual: '🎮', league: '⚔️', exhibition: '🎪' };
+
+    // ── YouTube – Bakugan opening animation "Two Worlds Collide" ──
+    // Multiple IDs tried in sequence; first one that embeds wins
+    const VIDEO_IDS = [
+      'xhYQlCMEpao',  // Bakugan Battle Brawlers Opening HD
+      'TLO_PLSGzsk',  // Bakugan S1 theme 4K
+      'JuoJnYZYmU0',  // Two Worlds Collide opening
+      'chsBeG8sKFA',  // Bakugan theme song
+      'p5O8oHg2_Wo',  // opening animation upload
+      'lNpJtY3kjfc',  // English opening alt
+      'sRwGQMvipnk',  // fan upload
+      'mf8dusSJUXw'   // original fallback
+    ];
+    let currentVideoIndex = 0;
+    let ytPlayer = null, isMuted = true;
+
+    function loadYouTube() {
+      initParticles('particles');
+      initEnergyRings();
+      const tag = document.createElement('script');
+      tag.src = 'https://www.youtube.com/iframe_api';
+      document.head.appendChild(tag);
+    }
+
+    window.onYouTubeIframeAPIReady = function() {
+      const wrap = document.getElementById('video-bg');
+      const div = document.createElement('div');
+      div.id = 'yt-player';
+      wrap.insertBefore(div, wrap.firstChild);
+      createPlayer(VIDEO_IDS[0]);
+    };
+
+    function createPlayer(vid) {
+      if (ytPlayer && ytPlayer.destroy) { try { ytPlayer.destroy(); } catch(e){} }
+      const wrap = document.getElementById('video-bg');
+      let el = document.getElementById('yt-player');
+      if (!el) { el = document.createElement('div'); el.id = 'yt-player'; wrap.insertBefore(el, wrap.firstChild); }
+
+      ytPlayer = new YT.Player('yt-player', {
+        host: 'https://www.youtube-nocookie.com',
+        videoId: vid,
+        width: '1920', height: '1080',
+        playerVars: {
+          autoplay:1, mute:1, loop:1, playlist:vid,
+          controls:0, showinfo:0, rel:0,
+          modestbranding:1, iv_load_policy:3, playsinline:1,
+          enablejsapi:1, origin: window.location.origin,
+          fs:0, disablekb:1, cc_load_policy:0
+        },
+        events: {
+          onReady: e => {
+            e.target.setVolume(0);
+            e.target.playVideo();
+            document.getElementById('video-bg').style.opacity = '1';
+          },
+          onStateChange: e => {
+            if (e.data === YT.PlayerState.PLAYING) {
+              document.getElementById('video-bg').style.transition = 'opacity 1s';
+              document.getElementById('video-bg').style.opacity = '1';
+              // Fade out the opaque fallback so the actual video shows through
+              const fb = document.querySelector('.hero-bg-fallback');
+              if (fb) { fb.style.opacity = '0'; }
+            }
+            if (e.data === YT.PlayerState.CUED || e.data === -1) e.target.playVideo();
+          },
+          onError: () => {
+            currentVideoIndex++;
+            if (currentVideoIndex < VIDEO_IDS.length) {
+              setTimeout(() => createPlayer(VIDEO_IDS[currentVideoIndex]), 300);
+            }
+          }
+        }
+      });
+    }
+
+    const soundBtn = document.getElementById('sound-btn');
+    soundBtn.addEventListener('click', () => {
+      if (!ytPlayer || typeof ytPlayer.unMute !== 'function') return;
+      if (isMuted) {
+        ytPlayer.unMute(); ytPlayer.setVolume(80);
+        soundBtn.textContent = '🔊';
+        soundBtn.style.borderColor = 'var(--accent)';
+        soundBtn.style.boxShadow = '0 0 12px var(--accent-glow)';
+      } else {
+        ytPlayer.mute();
+        soundBtn.textContent = '🔇';
+        soundBtn.style.borderColor = '';
+        soundBtn.style.boxShadow = '';
+      }
+      isMuted = !isMuted;
+    });
+
+    function initEnergyRings() {
+      const container = document.getElementById('energy-rings');
+      const colors = ['#FF4500','#9B00FF','#0088FF','#FFD700'];
+      for (let i = 0; i < 6; i++) {
+        const ring = document.createElement('div');
+        ring.className = 'energy-ring';
+        const size = Math.random() * 200 + 100;
+        ring.style.cssText = `width:${size}px;height:${size}px;left:${Math.random()*100}%;top:${Math.random()*100}%;border-color:${colors[i%colors.length]};border-width:${Math.random()*2+1}px;animation-duration:${Math.random()*8+6}s;animation-delay:${Math.random()*6}s;`;
+        container.appendChild(ring);
+      }
+    }
+
+    loadYouTube();
+
+    fetch('/api/auth/stats').then(r=>r.json()).then(d=>{
+      document.getElementById('stat-users').textContent = d.users;
+      document.getElementById('stat-threads').textContent = d.threads;
+      document.getElementById('stat-events').textContent = d.events;
+    }).catch(()=>{});
+
+    fetch('/api/forums/threads?limit=6').then(r=>r.json()).then(d=>{
+      const el = document.getElementById('recent-threads');
+      if(!d.threads?.length){el.innerHTML='<p class="text-muted" style="padding:0.75rem">אין שרשורים עדיין</p>';return;}
+      el.innerHTML=d.threads.map(t=>`
+        <div class="latest-thread" onclick="location.href='/thread?id=${t.id}'">
+          <div class="lt-icon">${t.is_pinned?'📌':'💬'}</div>
+          <div class="lt-info">
+            <div class="lt-title">${t.title}</div>
+            <div class="lt-meta">${t.username} · ${timeAgo(t.created_at)} · ${t.category_name}</div>
+          </div>
+        </div>`).join('');
+    }).catch(()=>{});
+
+    fetch('/api/events?status=upcoming').then(r=>r.json()).then(events=>{
+      const el = document.getElementById('upcoming-events');
+      if(!events?.length){el.innerHTML='<p class="text-muted" style="padding:0.75rem">אין אירועים קרובים</p>';return;}
+      el.innerHTML=events.slice(0,3).map(e=>`
+        <div class="event-card event-card-mini" onclick="location.href='/events'">
+          <div class="event-banner">
+            <div style="font-size:2rem;position:relative;z-index:1">${eventTypeEmojis[e.event_type] || '🏆'}</div>
+            <div class="event-status status-${e.status}">קרוב</div>
+          </div>
+          <div class="event-body">
+            <div class="event-title" style="font-size:0.9rem">${e.title}</div>
+            <div class="event-meta">
+              <div class="event-meta-item">📅 ${formatEventDate(e.event_date)}</div>
+              ${e.location ? `<div class="event-meta-item">📍 ${e.location}</div>` : ''}
+            </div>
+          </div>
+        </div>`).join('');
+    }).catch(()=>{});
+  </script>
+</body>
+</html>

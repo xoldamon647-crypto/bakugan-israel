@@ -1,0 +1,8 @@
+node_modules/
+bakugan.db
+backups/
+.env
+nohup.out
+*.log
+.DS_Store
+.claude/

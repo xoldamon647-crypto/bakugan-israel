@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ויקי – בקוגן ישראל</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .wiki-layout { display: grid; grid-template-columns: 260px 1fr; gap: 2rem; align-items: start; }
+    .wiki-nav { position: sticky; top: calc(var(--nav-height) + 1rem); background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem; }
+    .wiki-nav-title { font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-secondary); margin-bottom: 1rem; }
+    .wiki-nav-item { display: flex; align-items: center; gap: 0.6rem; padding: 0.6rem 0.75rem; border-radius: 8px; cursor: pointer; font-size: 0.9rem; transition: var(--transition); color: var(--text-secondary); }
+    .wiki-nav-item:hover, .wiki-nav-item.active { background: rgba(255,102,0,0.1); color: var(--accent); }
+    .wiki-content-area { min-width: 0; }
+    .wiki-page-header { margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+    .wiki-page-title { font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem; }
+    .wiki-page-meta { font-size: 0.85rem; color: var(--text-secondary); }
+    .wiki-back { display: inline-flex; align-items: center; gap: 0.4rem; color: var(--accent); cursor: pointer; font-size: 0.9rem; margin-bottom: 1.5rem; }
+    @media (max-width: 800px) { .wiki-layout { grid-template-columns: 1fr; } .wiki-nav { position: static; } }
+  </style>
+</head>
+<body>
+  <!-- Floating bakugan background decorations (shown when viewing a character page) -->
+  <div class="wiki-float-bg" id="wiki-float-bg" style="display:none">
+    <img id="wfb-1" src="" alt="" onerror="this.style.display='none'">
+    <img id="wfb-2" src="" alt="" onerror="this.style.display='none'">
+    <img id="wfb-3" src="" alt="" onerror="this.style.display='none'">
+    <img id="wfb-4" src="" alt="" onerror="this.style.display='none'">
+  </div>
+
+  <nav class="navbar" id="navbar"></nav>
+  <div class="page-wrapper">
+    <div class="page-banner">
+      <div class="page-banner-bg" id="wiki-banner-bg" style="background-image:url('/bkimg?p=f/fb/Fusion_Dragonoid_Appears.jpg');background-color:#060610;"></div>
+      <div class="ambient-video-wrap" id="wiki-ambient-video"></div>
+      <div class="page-banner-overlay"></div>
+      <div class="page-banner-content">
+        <h1 class="page-banner-title" id="wiki-banner-title">📖 <span style="color:var(--ventus)">ויקי</span> בקוגן</h1>
+        <p class="page-banner-subtitle" id="wiki-banner-sub">מידע מקיף על עונות, בקוגן ודמויות</p>
+      </div>
+    </div>
+
+  <!-- Scrolling strip -->
+  <div class="bk-deco-strip">
+              <div class="bk-deco-strip-inner">
+      <img src="/bkimg?p=f/f7/Bakugan_Dan.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=c/cc/Image3.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=c/c4/BK_CD_Skyress.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=6/66/ShunCN.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=1/1b/BK_CD_Naga_2.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=7/78/S1Masquerade.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=d/d3/Viper_helios.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=7/72/SpectraPh.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=5/5b/Image29.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=4/40/Image28.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=d/de/BK_Linehalt.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=7/78/Jakex.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=9/95/Fabia_sheen.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=d/db/BarodiusGI.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=3/3b/Kazarina_GI.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=9/9f/Bak_magmel_174x252.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=5/5c/Bak_anubias_174x252.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=d/d4/Dan_in_Mechtanium_Surge.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=c/c3/AliceTransparentSmall.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=c/c3/Julie.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=9/9c/Marucho_2.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=b/b5/Ren_GI.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=0/06/Image22.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=9/9f/Image18.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=6/6d/Image26.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=3/39/Nurzak_GI.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=7/74/Stoica_GI.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=6/64/Gil.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=3/38/Hal-G.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=d/d3/BK_CD_HMAlphaHydranoid.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=c/cf/BK_CD_Gorem.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=1/11/Bk_cd_percival.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=1/17/BK_CD_Ingram.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=5/58/BK_CD_Tigrerra.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=0/0a/Chara_hydron.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=2/28/Wilda_S2PosterImage.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=1/1f/BK_CD_Nemus.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=c/c6/BC_Dharak.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=c/c8/BC_Lumagrowl.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=d/dc/BK_Krakix.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=e/ee/BK_Aranaut.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=f/f7/Bakugan_Dan.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=c/cc/Image3.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=c/c4/BK_CD_Skyress.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=6/66/ShunCN.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=1/1b/BK_CD_Naga_2.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=7/78/S1Masquerade.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=d/d3/Viper_helios.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=7/72/SpectraPh.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=5/5b/Image29.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=4/40/Image28.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=d/de/BK_Linehalt.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=7/78/Jakex.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=9/95/Fabia_sheen.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=d/db/BarodiusGI.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=3/3b/Kazarina_GI.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=9/9f/Bak_magmel_174x252.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=5/5c/Bak_anubias_174x252.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=d/d4/Dan_in_Mechtanium_Surge.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=c/c3/AliceTransparentSmall.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=c/c3/Julie.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=9/9c/Marucho_2.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=b/b5/Ren_GI.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=0/06/Image22.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=9/9f/Image18.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=6/6d/Image26.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=3/39/Nurzak_GI.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=7/74/Stoica_GI.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=6/64/Gil.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=3/38/Hal-G.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=d/d3/BK_CD_HMAlphaHydranoid.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=c/cf/BK_CD_Gorem.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=1/11/Bk_cd_percival.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=1/17/BK_CD_Ingram.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=5/58/BK_CD_Tigrerra.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=0/0a/Chara_hydron.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=2/28/Wilda_S2PosterImage.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=1/1f/BK_CD_Nemus.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=c/c6/BC_Dharak.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=c/c8/BC_Lumagrowl.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=d/dc/BK_Krakix.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=e/ee/BK_Aranaut.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      </div>
+  </div>
+
+    <div class="container" style="padding-top:2rem;padding-bottom:4rem">
+      <!-- Season cards (shown first) -->
+      <div id="wiki-home">
+        <div class="section-header" style="margin-bottom:2rem">
+          <h2 class="section-title">עונות <span>הסדרה</span></h2>
+          <p class="section-desc">בחר עונה כדי לקרוא מידע מפורט</p>
+        </div>
+        <div class="wiki-seasons" id="seasons-grid"><div class="spinner"></div></div>
+
+        <div class="divider"></div>
+        <div class="section-header" style="margin-bottom:1.5rem">
+          <h2 class="section-title">דמויות, <span>בקוגן ועוד</span></h2>
+          <p class="section-desc">דפי דמויות מכל עונות הסדרה – לוחמים, נבלים ובקוגן</p>
+        </div>
+        <div id="all-pages-grid" style="display:block"></div>
+
+        <div id="admin-wiki-btn" class="hidden" style="text-align:center;margin-top:2rem">
+          <button class="btn btn-primary" onclick="openModal('create-page-modal')">+ הוסף דף ויקי</button>
+        </div>
+      </div>
+
+      <!-- Page view -->
+      <div id="wiki-page-view" class="hidden">
+        <div class="wiki-layout">
+          <div class="wiki-nav">
+            <div class="wiki-nav-title">📚 ניווט</div>
+            <div id="wiki-nav-items"></div>
+          </div>
+          <div class="wiki-content-area">
+            <div class="wiki-back" onclick="showHome()">← חזרה לכל הדפים</div>
+            <div class="wiki-page-header">
+              <h1 class="wiki-page-title" id="page-title"></h1>
+              <div class="wiki-page-meta" id="page-meta"></div>
+            </div>
+            <div class="wiki-content" id="page-content"></div>
+            <div id="edit-page-btn" class="hidden" style="margin-top:2rem">
+              <button class="btn btn-sm btn-outline" onclick="openEditModal()">✏️ ערוך דף</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Page Modal -->
+  <div class="modal-overlay" id="create-page-modal">
+    <div class="modal" style="max-width:700px">
+      <div class="modal-header">
+        <h3 class="modal-title">📝 דף ויקי חדש</h3>
+        <button class="modal-close" onclick="closeModal('create-page-modal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+          <div class="form-group"><label class="form-label">Slug (URL)</label><input id="page-slug" class="form-input" placeholder="season-5" dir="ltr"></div>
+          <div class="form-group"><label class="form-label">כותרת</label><input id="page-title-input" class="form-input" placeholder="שם הדף"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+          <div class="form-group"><label class="form-label">עונה (0=כללי)</label><input type="number" id="page-season" class="form-input" value="0" min="0"></div>
+          <div class="form-group"><label class="form-label">קטגוריה</label>
+            <select id="page-category" class="form-input">
+              <option value="seasons">עונות</option>
+              <option value="characters">דמויות</option>
+              <option value="bakugan">בקוגן</option>
+              <option value="general">כללי</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group"><label class="form-label">תוכן (HTML)</label><textarea id="page-content-input" class="form-input" rows="10" placeholder="<h2>...</h2><p>...</p>" dir="rtl"></textarea></div>
+        <div id="page-error" class="form-error hidden"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('create-page-modal')">ביטול</button>
+        <button class="btn btn-primary" onclick="createPage()">שמור דף</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer"><div class="container"><div class="footer-bottom"><p>© 2026 בקוגן ישראל</p></div></div></footer>
+  <script src="/js/main.js"></script>
+  <script src="/js/wiki.js"></script>
+</body>
+</html>

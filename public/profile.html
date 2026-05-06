@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>פרופיל – בקוגן ישראל</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .profile-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 2rem; }
+    .profile-tabs { display: flex; gap: 0.25rem; border-bottom: 1px solid var(--border); padding: 0 1.5rem; background: var(--bg-card); }
+    .profile-tab { padding: 1rem 1.25rem; border-bottom: 2px solid transparent; color: var(--text-secondary); cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: var(--transition); }
+    .profile-tab.active { border-bottom-color: var(--accent); color: var(--accent); }
+    .profile-tab-content { display: none; padding: 1.5rem; }
+    .profile-tab-content.active { display: block; }
+    .my-thread-item { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid var(--border); }
+    .my-thread-item:last-child { border-bottom: none; }
+  </style>
+</head>
+<body>
+  <nav class="navbar" id="navbar"></nav>
+  <div class="page-wrapper">
+    <div id="profile-container"><div class="spinner" style="margin-top:5rem"></div></div>
+  </div>
+
+  <footer class="footer"><div class="container"><div class="footer-bottom"><p>© 2026 בקוגן ישראל</p></div></div></footer>
+
+  <script src="/js/main.js"></script>
+  <script>
+    if (!Auth.isLoggedIn()) window.location.href = '/login';
+
+    async function loadProfile() {
+      try {
+        const user = await apiFetch('/auth/me');
+        renderProfile(user);
+      } catch(e) {
+        document.getElementById('profile-container').innerHTML = `<div class="empty-state"><div class="icon">❌</div><p>${e.message}</p></div>`;
+      }
+    }
+
+    function renderProfile(user) {
+      const roleLabel = { admin: 'מנהל 👑', moderator: 'מנחה 🛡️', user: 'חבר' }[user.role] || 'חבר';
+      document.getElementById('profile-container').innerHTML = `
+        <div class="profile-card">
+          <div class="profile-banner" style="background:linear-gradient(135deg,rgba(255,69,0,0.3),rgba(139,0,255,0.3))">
+            <div class="profile-avatar-wrap">${user.avatar ? `<img src="${user.avatar}" alt="">` : user.username[0]}</div>
+          </div>
+          <div class="profile-info">
+            <div class="profile-username">${user.username}</div>
+            <span class="profile-role role-${user.role}">${roleLabel}</span>
+            <p class="profile-bio">${user.bio || 'אין תיאור עדיין...'}</p>
+            <div class="profile-stats">
+              <div class="profile-stat"><strong>${user.threadCount}</strong><span>שרשורים</span></div>
+              <div class="profile-stat"><strong>${user.postCount}</strong><span>תגובות</span></div>
+              <div class="profile-stat"><strong>${user.eventCount}</strong><span>אירועים</span></div>
+              <div class="profile-stat"><strong>${formatDate(user.created_at)}</strong><span>חבר מאז</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="profile-tabs" id="profile-tabs">
+          <div class="profile-tab active" onclick="switchTab('activity', this)">פעילות אחרונה</div>
+          <div class="profile-tab" onclick="switchTab('settings', this)">הגדרות</div>
+        </div>
+
+        <div class="profile-tab-content active" id="tab-activity">
+          <div id="user-threads"><div class="spinner"></div></div>
+        </div>
+
+        <div class="profile-tab-content" id="tab-settings">
+          <div style="max-width:480px">
+            <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:1.5rem">עריכת פרופיל</h3>
+            <div class="form-group">
+              <label class="form-label">ביוגרפיה</label>
+              <textarea id="edit-bio" class="form-input" rows="4" placeholder="ספר על עצמך...">${user.bio || ''}</textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">URL תמונת פרופיל</label>
+              <input type="url" id="edit-avatar" class="form-input" placeholder="https://..." value="${user.avatar || ''}" dir="ltr">
+            </div>
+            <div id="settings-msg" class="hidden"></div>
+            <button class="btn btn-primary mt-2" onclick="saveSettings()">שמור שינויים</button>
+          </div>
+        </div>
+      `;
+
+      loadUserThreads(user.id);
+    }
+
+    function switchTab(tab, el) {
+      document.querySelectorAll('.profile-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.profile-tab-content').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+      document.getElementById(`tab-${tab}`).classList.add('active');
+    }
+
+    async function loadUserThreads() {
+      try {
+        const data = await apiFetch('/forums/threads?limit=10');
+        const user = Auth.getUser();
+        const myThreads = data.threads?.filter(t => t.user_id === user?.id) || [];
+        const el = document.getElementById('user-threads');
+        if (!myThreads.length) { el.innerHTML = '<p class="text-muted">אין שרשורים עדיין. <a href="/forums" style="color:var(--accent)">פתח את הראשון!</a></p>'; return; }
+        el.innerHTML = `<h4 style="font-weight:700;margin-bottom:1rem">השרשורים שלי</h4>` +
+          myThreads.map(t => `
+            <div class="my-thread-item">
+              <div>
+                <a href="/thread?id=${t.id}" style="font-weight:600;color:var(--text-primary);text-decoration:none">${t.title}</a>
+                <div class="text-muted text-sm">${t.category_name} · ${timeAgo(t.created_at)} · ${t.post_count} תגובות</div>
+              </div>
+              <span class="text-sm text-muted">${t.views} צפיות</span>
+            </div>
+          `).join('');
+      } catch {}
+    }
+
+    async function saveSettings() {
+      const bio = document.getElementById('edit-bio').value;
+      const avatar = document.getElementById('edit-avatar').value;
+      const msgEl = document.getElementById('settings-msg');
+      try {
+        await apiFetch('/auth/me', { method: 'PUT', body: { bio, avatar } });
+        const user = Auth.getUser();
+        Auth.setAuth(Auth.getToken(), { ...user, bio, avatar });
+        msgEl.className = 'form-success';
+        msgEl.textContent = '✅ פרופיל עודכן בהצלחה!';
+        msgEl.classList.remove('hidden');
+        showToast('פרופיל עודכן!', 'success');
+      } catch(e) {
+        msgEl.className = 'form-error';
+        msgEl.textContent = '⚠️ ' + e.message;
+        msgEl.classList.remove('hidden');
+      }
+    }
+
+    loadProfile();
+  </script>
+</body>
+</html>

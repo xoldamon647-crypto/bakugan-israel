@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>הודעות – בקוגן ישראל</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .messages-layout { display: grid; grid-template-columns: 300px 1fr; gap: 1.5rem; align-items: start; min-height: 600px; }
+    .conversations-list { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1rem; }
+    .conversation-item {
+      display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; border-radius: 8px;
+      cursor: pointer; transition: var(--tr); margin-bottom: 0.5rem;
+    }
+    .conversation-item:hover, .conversation-item.active { background: var(--bg-card-hover); }
+    .conversation-item .avatar-sm { flex-shrink: 0; }
+    .conversation-item .conv-info { flex: 1; min-width: 0; }
+    .conversation-item .conv-name { font-weight: 600; font-size: 0.9rem; margin-bottom: 0.2rem; }
+    .conversation-item .conv-last-msg { font-size: 0.8rem; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .conversation-item .conv-time { font-size: 0.7rem; color: var(--text-muted); }
+    .conversation-item .unread-badge {
+      background: var(--accent); color: black; font-size: 0.7rem; font-weight: 700;
+      padding: 0.2rem 0.4rem; border-radius: 10px; min-width: 18px; text-align: center;
+    }
+    .messages-area { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); display: flex; flex-direction: column; min-height: 500px; }
+    .messages-header {
+      padding: 1rem 1.5rem; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 0.75rem;
+    }
+    .messages-list { flex: 1; padding: 1rem; overflow-y: auto; max-height: 400px; }
+    .message-item {
+      display: flex; gap: 0.75rem; margin-bottom: 1rem; align-items: flex-start;
+    }
+    .message-item.own { flex-direction: row-reverse; }
+    .message-item .avatar-sm { flex-shrink: 0; margin-top: 0.2rem; }
+    .message-bubble {
+      max-width: 70%; padding: 0.75rem 1rem; border-radius: 18px;
+      background: var(--bg-card-hover); position: relative;
+    }
+    .message-item.own .message-bubble { background: var(--accent); color: black; }
+    .message-content { line-height: 1.4; }
+    .message-time { font-size: 0.7rem; color: var(--text-muted); margin-top: 0.3rem; }
+    .message-compose {
+      border-top: 1px solid var(--border); padding: 1rem 1.5rem;
+      display: flex; gap: 0.75rem; align-items: flex-end;
+    }
+    .message-input {
+      flex: 1; background: var(--bg-secondary); border: 1px solid var(--border);
+      border-radius: 20px; padding: 0.75rem 1rem; color: var(--text-primary);
+      outline: none; resize: none; min-height: 40px; max-height: 120px;
+    }
+    .message-send-btn {
+      background: var(--accent); color: black; border: none; border-radius: 50%;
+      width: 40px; height: 40px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: var(--tr);
+    }
+    .message-send-btn:hover { transform: scale(1.1); }
+    .empty-messages { text-align: center; padding: 3rem 1rem; color: var(--text-secondary); }
+    @media (max-width: 768px) { .messages-layout { grid-template-columns: 1fr; } .conversations-list { display: none; } }
+  </style>
+</head>
+<body>
+  <nav class="navbar" id="navbar"></nav>
+  <div class="page-wrapper">
+    <div class="page-banner">
+      <div class="page-banner-bg" style="background: linear-gradient(135deg, #1a1a3a, #2a2a5a, #3a3a7a);"></div>
+      <div class="page-banner-overlay"></div>
+      <div class="page-banner-content">
+        <h1 class="page-banner-title">💌 <span style="color:var(--aquos)">הודעות</span> פרטיות</h1>
+        <p class="page-banner-subtitle">שלח הודעות פרטיות לחברי הקהילה</p>
+      </div>
+    </div>
+
+    <div class="container section-sm">
+      <div id="messages-container"><div class="spinner" style="margin-top:3rem"></div></div>
+    </div>
+  </div>
+
+  <script src="/js/main.js"></script>
+  <script>
+    const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+    let currentUserId = null;
+    let conversations = [];
+
+    if (!Auth.isLoggedIn()) window.location.href = '/login';
+
+    async function loadMessages() {
+      try {
+        conversations = await apiFetch('/messages/conversations');
+        renderMessages();
+      } catch(e) {
+        document.getElementById('messages-container').innerHTML = `<div class="empty-state"><div class="icon">❌</div><p>${e.message}</p></div>`;
+      }
+    }
+
+    function renderMessages() {
+      if (!conversations.length) {
+        document.getElementById('messages-container').innerHTML = `
+          <div class="empty-messages">
+            <div style="font-size:3rem;margin-bottom:1rem">💌</div>
+            <h3>אין שיחות עדיין</h3>
+            <p>התחל שיחה עם חברי הקהילה!</p>
+          </div>
+        `;
+        return;
+      }
+
+      document.getElementById('messages-container').innerHTML = `
+        <div class="messages-layout">
+          <div class="conversations-list">
+            <h3 style="margin-bottom:1rem;font-size:1.1rem">שיחות</h3>
+            ${conversations.map(c => `
+              <div class="conversation-item ${c.other_user_id === currentUserId ? 'active' : ''}" onclick="openConversation('${c.other_user_id}')">
+                <div class="avatar-sm">${c.other_avatar ? `<img src="${c.other_avatar}" alt="">` : c.other_username[0]}</div>
+                <div class="conv-info">
+                  <div class="conv-name">${c.other_username}</div>
+                  <div class="conv-last-msg">${c.last_message ? esc(c.last_message) : 'אין הודעות'}</div>
+                </div>
+                ${c.unread_count > 0 ? `<div class="unread-badge">${c.unread_count}</div>` : ''}
+              </div>
+            `).join('')}
+          </div>
+          <div id="chat-area">
+            ${currentUserId ? '<div class="spinner"></div>' : `
+              <div class="empty-messages">
+                <div style="font-size:3rem;margin-bottom:1rem">💬</div>
+                <h3>בחר שיחה</h3>
+                <p>לחץ על שיחה מהרשימה כדי לקרוא הודעות</p>
+              </div>
+            `}
+          </div>
+        </div>
+      `;
+
+      if (currentUserId) loadConversation(currentUserId);
+    }
+
+    async function openConversation(userId) {
+      currentUserId = userId;
+      renderMessages();
+    }
+
+    async function loadConversation(userId) {
+      try {
+        const data = await apiFetch(`/messages/${userId}`);
+        renderConversation(data);
+      } catch(e) {
+        document.getElementById('chat-area').innerHTML = `<div class="empty-state"><div class="icon">❌</div><p>${e.message}</p></div>`;
+      }
+    }
+
+    function renderConversation(data) {
+      const chatArea = document.getElementById('chat-area');
+      chatArea.innerHTML = `
+        <div class="messages-area">
+          <div class="messages-header">
+            <div class="avatar-sm">${data.user.avatar ? `<img src="${data.user.avatar}" alt="">` : data.user.username[0]}</div>
+            <div>
+              <div style="font-weight:600">${data.user.username}</div>
+              <div style="font-size:0.8rem;color:var(--text-secondary)">שיחה פרטית</div>
+            </div>
+          </div>
+          <div class="messages-list" id="messages-list">
+            ${data.messages.map(m => `
+              <div class="message-item ${m.sender_id === Auth.getUser()?.id ? 'own' : ''}">
+                <div class="avatar-sm">${m.avatar ? `<img src="${m.avatar}" alt="">` : m.username[0]}</div>
+                <div class="message-bubble">
+                  <div class="message-content">${esc(m.content)}</div>
+                  <div class="message-time">${formatDateTime(m.created_at)}</div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+          <div class="message-compose">
+            <textarea class="message-input" id="message-input" placeholder="כתוב הודעה..." onkeydown="handleMessageKeydown(event)"></textarea>
+            <button class="message-send-btn" onclick="sendMessage()">📤</button>
+          </div>
+        </div>
+      `;
+
+      // Scroll to bottom
+      setTimeout(() => {
+        const list = document.getElementById('messages-list');
+        list.scrollTop = list.scrollHeight;
+      }, 100);
+    }
+
+    function handleMessageKeydown(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    }
+
+    async function sendMessage() {
+      const input = document.getElementById('message-input');
+      const content = input.value.trim();
+      if (!content) return;
+
+      try {
+        await apiFetch(`/messages/${currentUserId}`, { method: 'POST', body: { content } });
+        input.value = '';
+        loadConversation(currentUserId);
+        loadMessages(); // Refresh conversations
+      } catch(e) {
+        showToast('שגיאה בשליחת הודעה: ' + e.message, 'error');
+      }
+    }
+
+    loadMessages();
+  </script>
+</body>
+</html>
