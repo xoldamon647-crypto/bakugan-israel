@@ -138,22 +138,15 @@ function initDB() {
     );
   `);
 
-  // Clean up seeded test threads and events — runs on every start but is a no-op once deleted
+  // Delete all test content created by admin users (seeded data) — no-op once cleaned
   db.exec(`
     DELETE FROM forum_posts WHERE thread_id IN (
-      SELECT id FROM forum_threads WHERE title IN (
-        'ברוכים הבאים לפורום בקוגן ישראל! 🎉',
-        'טיפים לבניית חפיסה מנצחת'
-      )
+      SELECT t.id FROM forum_threads t
+      JOIN users u ON u.id = t.user_id WHERE u.role = 'admin'
     );
-    DELETE FROM forum_threads WHERE title IN (
-      'ברוכים הבאים לפורום בקוגן ישראל! 🎉',
-      'טיפים לבניית חפיסה מנצחת'
-    );
-    DELETE FROM events WHERE title IN (
-      'טורניר פתיחת העונה 2026',
-      'ערב שחקנים ירושלים'
-    );
+    DELETE FROM forum_threads WHERE user_id IN (SELECT id FROM users WHERE role = 'admin');
+    DELETE FROM event_applications WHERE event_id IN (SELECT id FROM events WHERE created_by IN (SELECT id FROM users WHERE role = 'admin'));
+    DELETE FROM events WHERE created_by IN (SELECT id FROM users WHERE role = 'admin');
   `);
 
   seedData();
