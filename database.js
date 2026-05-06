@@ -1,8 +1,12 @@
 const { DatabaseSync } = require('node:sqlite');
 const bcrypt = require('bcryptjs');
 const { v4: uuidv4 } = require('uuid');
+const fs = require('fs');
+const path = require('path');
 
 const dbPath = process.env.DB_PATH || './bakugan.db';
+const dbDir = path.dirname(dbPath);
+if (!fs.existsSync(dbDir)) fs.mkdirSync(dbDir, { recursive: true });
 const db = new DatabaseSync(dbPath);
 
 function initDB() {
