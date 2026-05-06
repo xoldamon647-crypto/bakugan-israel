@@ -128,6 +128,32 @@ function initDB() {
       content TEXT NOT NULL,
       order_num INTEGER DEFAULT 0
     );
+
+    CREATE TABLE IF NOT EXISTS password_resets (
+      token TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      expires_at TEXT NOT NULL,
+      used INTEGER DEFAULT 0,
+      FOREIGN KEY (user_id) REFERENCES users(id)
+    );
+  `);
+
+  // Clean up seeded test threads and events — runs on every start but is a no-op once deleted
+  db.exec(`
+    DELETE FROM forum_posts WHERE thread_id IN (
+      SELECT id FROM forum_threads WHERE title IN (
+        'ברוכים הבאים לפורום בקוגן ישראל! 🎉',
+        'טיפים לבניית חפיסה מנצחת'
+      )
+    );
+    DELETE FROM forum_threads WHERE title IN (
+      'ברוכים הבאים לפורום בקוגן ישראל! 🎉',
+      'טיפים לבניית חפיסה מנצחת'
+    );
+    DELETE FROM events WHERE title IN (
+      'טורניר פתיחת העונה 2026',
+      'ערב שחקנים ירושלים'
+    );
   `);
 
   seedData();
@@ -2202,34 +2228,6 @@ function seedData() {
 </ul>
 `, 5);
 
-  const eventInsert = db.prepare(`INSERT INTO events (title, description, event_date, location, max_participants, event_type, status, prize, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`);
-  eventInsert.run(
-    'טורניר פתיחת העונה 2026',
-    'הטורניר הראשון של השנה! מגרש חינמי לכולם. הביאו את החפיסות הטובות ביותר שלכם!',
-    '2026-06-15T10:00',
-    'תל אביב – מרכז הנוער',
-    32,
-    'tournament',
-    'upcoming',
-    'גביע + סט כרטיסי מהדורה מוגבלת',
-    adminId
-  );
-
-  eventInsert.run(
-    'ערב שחקנים ירושלים',
-    'ערב אתגרים ידידותיים בירושלים. מתאים לכל הרמות!',
-    '2026-05-20T18:00',
-    'ירושלים – בית הנוער',
-    20,
-    'casual',
-    'upcoming',
-    '',
-    adminId
-  );
-
-  const threadInsert = db.prepare(`INSERT INTO forum_threads (category_id, user_id, title, content, is_pinned) VALUES (?, ?, ?, ?, ?)`);
-  threadInsert.run(1, adminId, 'ברוכים הבאים לפורום בקוגן ישראל! 🎉', 'שלום לכולם וברוכים הבאים לפורום הקהילה שלנו! כאן תוכלו לדון, לשתף ולהתחבר עם שחקנים אחרים בישראל.', 1);
-  threadInsert.run(4, adminId, 'טיפים לבניית חפיסה מנצחת', 'אשמח לשמוע את הטיפים שלכם לבניית חפיסה. מה הבקוגנים המועדפים עליכם?', 0);
 }
 
 module.exports = { db, initDB };

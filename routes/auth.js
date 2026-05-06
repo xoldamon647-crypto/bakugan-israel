@@ -1,12 +1,14 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 const { v4: uuidv4 } = require('uuid');
 const { db } = require('../database');
 const { authMiddleware, JWT_SECRET } = require('../middleware/auth');
+const { sendWelcome, sendPasswordReset } = require('../utils/email');
 const router = express.Router();
 
-router.post('/register', (req, res) => {
+router.post('/register', async (req, res) => {
   const { username, email, password } = req.body;
   if (!username || !email || !password)
     return res.status(400).json({ error: 'כל השדות נדרשים' });
@@ -25,6 +27,9 @@ router.post('/register', (req, res) => {
 
     const token = jwt.sign({ id, username, email, role: 'user' }, JWT_SECRET, { expiresIn: '7d' });
     res.json({ token, user: { id, username, email, role: 'user' } });
+
+    // Send welcome email after responding (non-blocking)
+    sendWelcome(email, username);
   } catch (e) {
     res.status(500).json({ error: 'שגיאת שרת' });
   }
@@ -41,6 +46,40 @@ router.post('/login', (req, res) => {
   db.prepare('UPDATE users SET last_seen = ? WHERE id = ?').run(new Date().toISOString().slice(0,19).replace('T',' '), user.id);
   const token = jwt.sign({ id: user.id, username: user.username, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
   res.json({ token, user: { id: user.id, username: user.username, email: user.email, role: user.role, avatar: user.avatar, bio: user.bio } });
+});
+
+router.post('/forgot-password', async (req, res) => {
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ error: 'אימייל נדרש' });
+
+  const user = db.prepare('SELECT id, username FROM users WHERE email = ?').get(email);
+  // Always return success — don't reveal if email exists
+  res.json({ success: true });
+  if (!user) return;
+
+  const token = crypto.randomBytes(32).toString('hex');
+  const expiresAt = new Date(Date.now() + 3600000).toISOString();
+
+  db.prepare('DELETE FROM password_resets WHERE user_id = ?').run(user.id);
+  db.prepare('INSERT INTO password_resets (token, user_id, expires_at) VALUES (?, ?, ?)').run(token, user.id, expiresAt);
+
+  sendPasswordReset(email, token);
+});
+
+router.post('/reset-password', (req, res) => {
+  const { token, password } = req.body;
+  if (!token || !password || password.length < 6)
+    return res.status(400).json({ error: 'סיסמה חייבת להכיל לפחות 6 תווים' });
+
+  const reset = db.prepare('SELECT * FROM password_resets WHERE token = ? AND used = 0').get(token);
+  if (!reset) return res.status(400).json({ error: 'קישור לא תקף' });
+  if (new Date(reset.expires_at) < new Date()) return res.status(400).json({ error: 'קישור פג תוקף, בקש קישור חדש' });
+
+  const hash = bcrypt.hashSync(password, 10);
+  db.prepare('UPDATE users SET password = ? WHERE id = ?').run(hash, reset.user_id);
+  db.prepare('UPDATE password_resets SET used = 1 WHERE token = ?').run(token);
+
+  res.json({ success: true });
 });
 
 router.get('/me', authMiddleware, (req, res) => {
