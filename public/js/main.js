@@ -126,6 +126,36 @@ function toggleMobileMenu() {
   document.getElementById('mobile-menu')?.classList.toggle('open');
 }
 
+// ─── Bottom nav (mobile app-style) ───
+function renderBottomNav() {
+  const path = window.location.pathname;
+  const loggedIn = Auth.isLoggedIn();
+
+  let nav = document.getElementById('bottom-nav');
+  if (!nav) {
+    nav = document.createElement('nav');
+    nav.id = 'bottom-nav';
+    nav.className = 'bottom-nav';
+    document.body.appendChild(nav);
+  }
+
+  const items = [
+    { href: '/',        icon: '🌀', label: 'בית' },
+    { href: '/forums',  icon: '💬', label: 'פורום' },
+    { href: '/wiki',    icon: '📖', label: 'ויקי' },
+    { href: '/events',  icon: '🏆', label: 'אירועים' },
+    { href: loggedIn ? '/profile' : '/login', icon: loggedIn ? '👤' : '🔑', label: loggedIn ? 'פרופיל' : 'כניסה' },
+  ];
+
+  nav.innerHTML = items.map(({ href, icon, label }) => {
+    const active = path === href || (href !== '/' && path.startsWith(href));
+    return `<a href="${href}" class="${active ? 'active' : ''}">
+      <span class="bn-icon">${icon}</span>
+      <span>${label}</span>
+    </a>`;
+  }).join('');
+}
+
 function logout() {
   Auth.clear();
   showToast('התנתקת בהצלחה', 'info');
@@ -285,6 +315,7 @@ function proxyBkImgs(root) {
 // ─── On DOM load ───
 document.addEventListener('DOMContentLoaded', () => {
   renderNavbar();
+  renderBottomNav();
   proxyBkImgs();
   // Watch for dynamically inserted content (wiki pages, etc.)
   new MutationObserver(muts => {
