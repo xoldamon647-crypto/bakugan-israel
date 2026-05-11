@@ -98,6 +98,12 @@ router.post('/:id/apply', (req, res) => {
     } catch {}
   }
 
+  // Prevent duplicate registration for logged-in users
+  if (userId) {
+    const existing = db.prepare('SELECT id FROM event_applications WHERE event_id = ? AND user_id = ?').get(req.params.id, userId);
+    if (existing) return res.status(409).json({ error: 'כבר נרשמת לאירוע זה' });
+  }
+
   const result = db.prepare(
     'INSERT INTO event_applications (event_id, user_id, name, is_coming, notes) VALUES (?, ?, ?, ?, ?)'
   ).run(req.params.id, userId, name.trim(), is_coming !== false ? 1 : 0, notes || '');

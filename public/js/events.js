@@ -29,7 +29,7 @@ function renderEvents() {
     return `
       <div class="event-card" onclick="openEventDetail(${e.id})">
         <div class="event-banner">
-          ${e.image ? `<img class="event-banner-img" src="${e.image}" alt="">` : ''}
+          ${e.image ? `<img class="event-banner-img" src="${e.image}" alt="" onerror="this.style.display='none'">` : ''}
           <div class="event-banner-overlay"></div>
           <div style="font-size:3rem;position:relative;z-index:1">${eventTypeEmojis[e.event_type] || '🏆'}</div>
           <div class="event-status status-${e.status}" style="position:absolute;top:0.75rem;right:0.75rem">
@@ -66,10 +66,14 @@ function renderEvents() {
 async function openEventDetail(id) {
   const data = await apiFetch(`/events/${id}`);
   const { event: e, applications } = data;
+  const user = Auth.getUser();
+  const alreadyApplied = user && applications.some(a => a.user_id === user.id);
 
   document.getElementById('modal-event-title').textContent = e.title;
   document.getElementById('modal-event-body').innerHTML = `
     <div style="margin-bottom:1.5rem">
+      ${e.image ? `<img src="${e.image}" alt="" onerror="this.style.display='none'"
+        style="width:100%;height:180px;object-fit:cover;border-radius:var(--radius);margin-bottom:1rem">` : ''}
       <div class="event-detail-grid">
         <div class="event-detail-item">
           <div class="event-detail-label">📅 תאריך</div>
@@ -84,38 +88,65 @@ async function openEventDetail(id) {
           <div class="event-detail-value">${eventTypeLabels[e.event_type] || e.event_type}</div>
         </div>
         <div class="event-detail-item">
-          <div class="event-detail-label">👥 משתתפים</div>
-          <div class="event-detail-value">${e.participant_count}${e.max_participants > 0 ? ' / ' + e.max_participants : ''}</div>
+          <div class="event-detail-label">👥 נרשמו</div>
+          <div class="event-detail-value" style="color:var(--accent);font-weight:800">${e.participant_count}${e.max_participants > 0 ? ' / ' + e.max_participants : ' איש'}</div>
         </div>
       </div>
-      ${e.prize ? `<div class="event-detail-item" style="margin-bottom:1rem"><div class="event-detail-label">🏅 פרס</div><div class="event-detail-value">${e.prize}</div></div>` : ''}
-      ${e.description ? `<div style="color:var(--text-secondary);line-height:1.8;margin-bottom:1.5rem">${e.description}</div>` : ''}
+      ${e.prize ? `<div style="margin:0.75rem 0"><span class="event-detail-label">🏅 פרס</span> <strong>${e.prize}</strong></div>` : ''}
+      ${e.description ? `<div style="color:var(--text-secondary);line-height:1.9;margin:1rem 0;white-space:pre-line">${e.description}</div>` : ''}
     </div>
 
     ${applications.length ? `
-      <div style="margin-bottom:1rem">
-        <div style="font-weight:700;margin-bottom:0.75rem">📋 רשומים (${applications.filter(a=>a.is_coming).length} מגיעים)</div>
+      <div style="margin-bottom:1.25rem;background:var(--bg-secondary);border-radius:var(--radius);padding:1rem">
+        <div style="font-weight:700;margin-bottom:0.75rem;font-size:0.95rem">
+          ✅ מגיעים (${applications.filter(a=>a.is_coming).length})
+        </div>
         <div class="participants-list">
           ${applications.map(a => `
             <div class="participant-item">
               <span>${a.is_coming ? '✅' : '❓'}</span>
-              <span>${a.name}</span>
-              ${a.notes ? `<span class="text-muted text-sm">– ${a.notes}</span>` : ''}
+              <span style="font-weight:600">${a.username ? `<a href="#" style="color:var(--accent);text-decoration:none">@${a.username}</a>` : a.name}</span>
+              ${a.notes ? `<span class="text-muted text-sm" style="margin-right:auto">– ${a.notes}</span>` : ''}
             </div>
           `).join('')}
         </div>
       </div>
-    ` : '<p class="text-muted">עדיין אין נרשמים</p>'}
+    ` : `<p class="text-muted" style="margin-bottom:1rem">עדיין אין נרשמים — היה הראשון! 🚀</p>`}
 
     ${e.status !== 'completed' ? `
-      <div style="text-align:center;margin-top:1.5rem">
-        <button class="btn btn-primary" onclick="closeModal('event-detail-modal'); openApply(${e.id}, '${e.title.replace(/'/g,"\\'")}')">
-          🏆 הרשם לאירוע
-        </button>
+      <div style="text-align:center">
+        ${alreadyApplied
+          ? `<div class="btn btn-secondary" style="cursor:default;opacity:0.8">✅ נרשמת לאירוע הזה</div>`
+          : Auth.isLoggedIn()
+            ? `<button class="btn btn-primary btn-lg" style="width:100%" onclick="quickApply(${e.id})">
+                ✅ אני מגיע/ה — ${user?.username}
+               </button>`
+            : `<div>
+                <button class="btn btn-primary btn-lg" style="width:100%;margin-bottom:0.5rem"
+                  onclick="closeModal('event-detail-modal'); openApply(${e.id}, '${e.title.replace(/'/g,"\\'")}')">
+                  📝 הרשמה לאירוע
+                </button>
+                <p class="text-muted text-sm"><a href="/login" style="color:var(--accent)">התחבר</a> לרישום מהיר עם החשבון שלך</p>
+               </div>`
+        }
       </div>
     ` : ''}
   `;
   openModal('event-detail-modal');
+}
+
+// 1-tap apply for logged-in users
+async function quickApply(eventId) {
+  const user = Auth.getUser();
+  if (!user) return openApply(eventId, '');
+  try {
+    await apiFetch(`/events/${eventId}/apply`, { method: 'POST', body: { name: user.username, is_coming: true, notes: '' } });
+    showToast('✅ נרשמת! נתראה שם 🎉', 'success');
+    closeModal('event-detail-modal');
+    loadEvents();
+  } catch(e) {
+    showToast('⚠️ ' + e.message, 'error');
+  }
 }
 
 function openApply(eventId, eventTitle) {
