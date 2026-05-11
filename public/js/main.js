@@ -89,17 +89,25 @@ function renderNavbar() {
         <span></span><span></span><span></span>
       </div>
     </div>
-    <div class="mobile-menu" id="mobile-menu">
-      ${links.map(l => `<a href="${l.href}">${l.icon} ${l.label}</a>`).join('')}
-      <div class="divider"></div>
-      ${loggedIn
-        ? `<a href="/profile">👤 הפרופיל שלי</a>
-           ${Auth.isAdmin() ? `<a href="/admin">⚙️ לוח מנהל</a>` : ''}
-           <a href="#" onclick="logout()">🚪 יציאה</a>`
-        : `<a href="/login">🔑 כניסה</a><a href="/register">✨ הרשמה</a>`
-      }
-    </div>
   `;
+
+  // Mobile menu must live on body, not inside navbar —
+  // navbar's backdrop-filter traps position:fixed children on iOS Safari
+  let mobileMenu = document.getElementById('mobile-menu');
+  if (!mobileMenu) {
+    mobileMenu = document.createElement('div');
+    mobileMenu.id = 'mobile-menu';
+    mobileMenu.className = 'mobile-menu';
+    document.body.appendChild(mobileMenu);
+  }
+  mobileMenu.innerHTML =
+    links.map(l => `<a href="${l.href}">${l.icon} ${l.label}</a>`).join('') +
+    `<div class="divider"></div>` +
+    (loggedIn
+      ? `<a href="/profile">👤 הפרופיל שלי</a>
+         ${Auth.isAdmin() ? `<a href="/admin">⚙️ לוח מנהל</a>` : ''}
+         <a href="#" onclick="logout()">🚪 יציאה</a>`
+      : `<a href="/login">🔑 כניסה</a><a href="/register">✨ הרשמה</a>`);
 
   window.addEventListener('scroll', () => {
     navEl.classList.toggle('scrolled', window.scrollY > 30);

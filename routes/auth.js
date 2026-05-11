@@ -83,13 +83,26 @@ router.post('/reset-password', (req, res) => {
 });
 
 router.get('/me', authMiddleware, (req, res) => {
-  const user = db.prepare('SELECT id, username, email, role, avatar, bio, attribute, created_at, last_seen FROM users WHERE id = ?').get(req.user.id);
-  if (!user) return res.status(404).json({ error: 'משתמש לא נמצא' });
-
-  const postCount = db.prepare('SELECT COUNT(*) as c FROM forum_posts WHERE user_id = ?').get(req.user.id)?.c || 0;
-  const threadCount = db.prepare('SELECT COUNT(*) as c FROM forum_threads WHERE user_id = ?').get(req.user.id)?.c || 0;
-  const eventCount = db.prepare('SELECT COUNT(*) as c FROM event_applications WHERE user_id = ?').get(req.user.id)?.c || 0;
-  res.json({ ...user, postCount, threadCount, eventCount });
+  try {
+    const user = db.prepare('SELECT id, username, email, role, avatar, bio, attribute, created_at, last_seen FROM users WHERE id = ?').get(req.user.id);
+    if (!user) return res.status(404).json({ error: 'משתמש לא נמצא' });
+    const postCount = db.prepare('SELECT COUNT(*) as c FROM forum_posts WHERE user_id = ?').get(req.user.id)?.c || 0;
+    const threadCount = db.prepare('SELECT COUNT(*) as c FROM forum_threads WHERE user_id = ?').get(req.user.id)?.c || 0;
+    const eventCount = db.prepare('SELECT COUNT(*) as c FROM event_applications WHERE user_id = ?').get(req.user.id)?.c || 0;
+    res.json({ ...user, postCount, threadCount, eventCount });
+  } catch(e) {
+    // Fallback: retry without attribute column in case migration hasn't run
+    try {
+      const user = db.prepare('SELECT id, username, email, role, avatar, bio, created_at, last_seen FROM users WHERE id = ?').get(req.user.id);
+      if (!user) return res.status(404).json({ error: 'משתמש לא נמצא' });
+      const postCount = db.prepare('SELECT COUNT(*) as c FROM forum_posts WHERE user_id = ?').get(req.user.id)?.c || 0;
+      const threadCount = db.prepare('SELECT COUNT(*) as c FROM forum_threads WHERE user_id = ?').get(req.user.id)?.c || 0;
+      const eventCount = db.prepare('SELECT COUNT(*) as c FROM event_applications WHERE user_id = ?').get(req.user.id)?.c || 0;
+      res.json({ ...user, attribute: '', postCount, threadCount, eventCount });
+    } catch(e2) {
+      res.status(500).json({ error: 'שגיאת שרת' });
+    }
+  }
 });
 
 router.put('/me', authMiddleware, (req, res) => {
