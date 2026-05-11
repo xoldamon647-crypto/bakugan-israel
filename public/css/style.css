@@ -982,8 +982,7 @@ a,button,input,select,textarea,[role="button"]{touch-action:manipulation}
   .bn-badge.hidden{display:none}
 
   /* ── navbar ── */
-  .nav-links,.nav-auth .btn,.nav-search,.nav-user{display:none}
-  .hamburger{display:flex;padding:10px;min-width:44px;min-height:44px;align-items:center;justify-content:center}
+  .nav-links,.nav-auth .btn,.nav-search,.nav-user,.hamburger{display:none!important}
   .mobile-menu{
     position:fixed;top:var(--nav-height);right:0;left:0;
     bottom:calc(64px + env(safe-area-inset-bottom,0px));

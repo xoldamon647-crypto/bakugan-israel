@@ -58,7 +58,9 @@
         const user = await apiFetch('/auth/me');
         renderProfile(user);
       } catch(e) {
-        document.getElementById('profile-container').innerHTML = `<div class="empty-state"><div class="icon">❌</div><p>${e.message}</p></div>`;
+        // Stale/invalid token — clear it and send to login
+        Auth.clear();
+        window.location.href = '/login';
       }
     }
 
