@@ -5,7 +5,28 @@ const compression = require('compression');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
 const https = require('https');
+const fs = require('fs');
+const { execSync } = require('child_process');
 const { initDB } = require('./database');
+
+// Version hash — changes every deploy, forces browsers to fetch new CSS/JS
+const DEPLOY_VER = (() => {
+  try { return execSync('git rev-parse --short HEAD').toString().trim(); }
+  catch { return Date.now().toString(36); }
+})();
+
+function serveHTML(res, filePath) {
+  try {
+    let html = fs.readFileSync(filePath, 'utf8');
+    // Inject ?v= into all local CSS/JS URLs so browsers re-fetch on new deploy
+    html = html.replace(/((?:href|src)=")(\/(?:css|js)\/[^"?]+)(")/g, `$1$2?v=${DEPLOY_VER}$3`);
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.send(html);
+  } catch {
+    res.status(404).end();
+  }
+}
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -60,7 +81,8 @@ app.use('/api', apiLimiter);
 
 app.use(express.json({ limit: '2mb' }));
 app.use(express.static(path.join(__dirname, 'public'), {
-  maxAge: isProd ? '5m' : 0,
+  maxAge: isProd ? '1y' : 0,
+  immutable: isProd,
 }));
 
 // ─── Health check for Railway ───
@@ -79,10 +101,10 @@ app.use('/api/messages', require('./routes/messages'));
 
 const pages = ['forums', 'events', 'wiki', 'rules', 'episodes', 'login', 'register', 'profile', 'admin', 'thread', 'messages', 'forgot-password', 'reset-password', 'store'];
 for (const page of pages) {
-  app.get(`/${page}`, (_, res) => res.sendFile(path.join(__dirname, 'public', `${page}.html`)));
+  app.get(`/${page}`, (_, res) => serveHTML(res, path.join(__dirname, 'public', `${page}.html`)));
 }
 
-app.get('*', (_, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
+app.get('*', (_, res) => serveHTML(res, path.join(__dirname, 'public', 'index.html')));
 
 app.use((err, req, res, next) => {
   if (isProd) {
