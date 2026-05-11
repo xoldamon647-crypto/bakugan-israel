@@ -56,6 +56,7 @@ function renderNavbar() {
     { href: '/wiki', label: 'ויקי', icon: '📖' },
     { href: '/episodes', label: 'פרקים', icon: '🎬' },
     { href: '/rules', label: 'חוקים', icon: '📜' },
+    { href: '/store', label: 'חנות', icon: '🛒' },
     ...(loggedIn ? [{ href: '/messages', label: 'הודעות', icon: '💌', badgeId: 'messages-badge' }] : []),
   ];
 

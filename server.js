@@ -77,7 +77,7 @@ app.use('/api/admin', require('./routes/admin'));
 app.use('/api/search', require('./routes/search'));
 app.use('/api/messages', require('./routes/messages'));
 
-const pages = ['forums', 'events', 'wiki', 'rules', 'episodes', 'login', 'register', 'profile', 'admin', 'thread', 'messages', 'forgot-password', 'reset-password'];
+const pages = ['forums', 'events', 'wiki', 'rules', 'episodes', 'login', 'register', 'profile', 'admin', 'thread', 'messages', 'forgot-password', 'reset-password', 'store'];
 for (const page of pages) {
   app.get(`/${page}`, (_, res) => res.sendFile(path.join(__dirname, 'public', `${page}.html`)));
 }

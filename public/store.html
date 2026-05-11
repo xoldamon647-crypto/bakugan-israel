@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>חנות בקוגן – WushWush Games</title>
+  <meta name="description" content="קנה בקוגן מקוריים בישראל – WushWush Games, החנות המומלצת של קהילת בקוגן ישראל">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .store-hero{
+      position:relative;min-height:420px;display:flex;align-items:center;justify-content:center;
+      overflow:hidden;text-align:center;padding:5rem 1rem 4rem;
+    }
+    .store-hero-bg{
+      position:absolute;inset:0;
+      background-image:url('/bkimg?p=f/fb/Fusion_Dragonoid_Appears.jpg');
+      background-size:cover;background-position:center top;
+      filter:brightness(0.28) saturate(1.4);
+    }
+    .store-hero-overlay{
+      position:absolute;inset:0;
+      background:linear-gradient(to bottom, rgba(6,6,16,0.3) 0%, rgba(6,6,16,0.85) 100%);
+    }
+    .store-hero-content{position:relative;z-index:1;max-width:680px;margin:0 auto}
+    .store-badge{
+      display:inline-flex;align-items:center;gap:0.5rem;
+      background:rgba(255,102,0,0.15);border:1px solid rgba(255,102,0,0.4);
+      color:var(--accent);font-family:'Orbitron',sans-serif;font-size:0.68rem;
+      letter-spacing:0.15em;padding:0.35rem 1rem;border-radius:50px;
+      margin-bottom:1.25rem;text-transform:uppercase;
+    }
+    .store-title{
+      font-family:'Audiowide',sans-serif;font-size:clamp(2rem,6vw,3.2rem);
+      font-weight:400;line-height:1.15;margin-bottom:0.5rem;
+      text-shadow:0 0 40px rgba(255,102,0,0.5);
+    }
+    .store-title span{color:var(--accent)}
+    .store-subtitle{font-size:1.05rem;color:var(--text-secondary);margin-bottom:2rem;line-height:1.6}
+    .store-cta-btn{
+      display:inline-flex;align-items:center;gap:0.6rem;
+      background:linear-gradient(135deg,var(--accent),#ff8c00);
+      color:#000;font-weight:800;font-size:1.05rem;
+      padding:0.9rem 2.2rem;border-radius:var(--radius-lg);
+      text-decoration:none;transition:transform 0.2s,box-shadow 0.2s;
+      font-family:'Heebo',sans-serif;
+      box-shadow:0 4px 24px rgba(255,102,0,0.45);
+    }
+    .store-cta-btn:hover{transform:translateY(-3px);box-shadow:0 8px 36px rgba(255,102,0,0.65)}
+
+    /* Trust bar */
+    .trust-bar{
+      background:rgba(255,102,0,0.07);border-top:1px solid rgba(255,102,0,0.2);
+      border-bottom:1px solid rgba(255,102,0,0.2);
+      padding:0.85rem 0;
+    }
+    .trust-bar-inner{
+      display:flex;justify-content:center;align-items:center;
+      gap:2.5rem;flex-wrap:wrap;
+    }
+    .trust-item{display:flex;align-items:center;gap:0.45rem;font-size:0.88rem;font-weight:600;color:var(--text-secondary)}
+    .trust-item strong{color:var(--accent)}
+
+    /* Why us */
+    .why-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1.2rem;margin-top:2rem}
+    .why-card{
+      background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);
+      padding:1.5rem;text-align:center;transition:var(--tr);
+    }
+    .why-card:hover{border-color:var(--border-accent);transform:translateY(-4px)}
+    .why-icon{font-size:2.2rem;margin-bottom:0.75rem}
+    .why-title{font-family:'Orbitron',sans-serif;font-size:0.82rem;font-weight:700;letter-spacing:0.06em;margin-bottom:0.5rem;color:var(--accent)}
+    .why-desc{font-size:0.86rem;color:var(--text-secondary);line-height:1.65}
+
+    /* Product showcase */
+    .product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:1rem;margin-top:2rem}
+    .product-card{
+      background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);
+      overflow:hidden;transition:var(--tr);cursor:pointer;
+      text-decoration:none;color:var(--text-primary);
+    }
+    .product-card:hover{border-color:var(--border-accent);transform:translateY(-4px);box-shadow:0 8px 28px rgba(0,0,0,0.4)}
+    .product-img{width:100%;height:160px;object-fit:cover;object-position:top;background:linear-gradient(135deg,#1a0500,#2a1000);display:block}
+    .product-body{padding:0.75rem}
+    .product-name{font-size:0.84rem;font-weight:700;margin-bottom:0.2rem}
+    .product-attr{font-size:0.72rem;color:var(--text-secondary);font-family:'Orbitron',sans-serif;letter-spacing:0.05em}
+    .product-avail{
+      display:inline-flex;align-items:center;gap:0.3rem;margin-top:0.4rem;
+      font-size:0.7rem;font-weight:700;color:var(--ventus);
+      background:rgba(0,204,68,0.1);padding:0.15rem 0.5rem;border-radius:4px;
+    }
+
+    /* Reviews */
+    .reviews-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.2rem;margin-top:2rem}
+    .review-card{
+      background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);
+      padding:1.25rem;transition:var(--tr);
+    }
+    .review-card:hover{border-color:var(--border-accent)}
+    .review-stars{color:#FFD700;font-size:0.95rem;margin-bottom:0.6rem;letter-spacing:0.1em}
+    .review-text{font-size:0.9rem;color:var(--text-secondary);line-height:1.7;margin-bottom:0.85rem;font-style:italic}
+    .review-author{display:flex;align-items:center;gap:0.6rem}
+    .review-avatar{
+      width:36px;height:36px;border-radius:50%;
+      background:linear-gradient(135deg,var(--accent),var(--darkus));
+      display:flex;align-items:center;justify-content:center;
+      font-weight:700;font-size:0.85rem;flex-shrink:0;
+    }
+    .review-name{font-weight:700;font-size:0.85rem}
+    .review-meta{font-size:0.75rem;color:var(--text-muted)}
+
+    /* Final CTA */
+    .store-final-cta{
+      text-align:center;
+      background:linear-gradient(135deg,rgba(255,102,0,0.08),rgba(155,0,255,0.08));
+      border:1px solid var(--border-accent);border-radius:var(--radius-lg);
+      padding:3rem 2rem;position:relative;overflow:hidden;
+    }
+    .store-final-cta::before{
+      content:'🌀';position:absolute;font-size:8rem;opacity:0.04;
+      top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;
+    }
+
+    @media(max-width:600px){
+      .trust-bar-inner{gap:1rem}
+      .product-grid{grid-template-columns:repeat(2,1fr)}
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar" id="navbar"></nav>
+
+  <!-- ══ HERO ══ -->
+  <div class="store-hero">
+    <div class="store-hero-bg"></div>
+    <div class="store-hero-overlay"></div>
+    <div class="store-hero-content">
+      <div class="store-badge">🛒 חנות מומלצת על ידי הקהילה</div>
+      <h1 class="store-title">WushWush <span>Games</span></h1>
+      <p class="store-subtitle">החנות הרשמית של קהילת בקוגן ישראל – מגוון בקוגן מקוריים, כדורים, ערכות ואביזרים. משלוח לכל הארץ, מחירים תחרותיים ושירות שקהילה שלמה מאחורו.</p>
+      <a href="https://wush.games/collection?handle=bakugan" target="_blank" rel="noopener" class="store-cta-btn">
+        🛒 לחנות עכשיו
+      </a>
+    </div>
+  </div>
+
+  <!-- ══ SCROLLING STRIP ══ -->
+  <div class="bk-deco-strip">
+    <div class="bk-deco-strip-inner">
+      <img src="/bkimg?p=f/f7/Bakugan_Dan.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=d/d3/Viper_helios.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=c/c4/BK_CD_Skyress.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=5/58/BK_CD_Tigrerra.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=1/1b/BK_CD_Naga_2.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=7/72/SpectraPh.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=d/de/BK_Linehalt.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=c/cf/BK_CD_Gorem.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=6/66/BK_CD_Preyas.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=d/d3/BK_CD_HMAlphaHydranoid.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=f/f7/Bakugan_Dan.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=d/d3/Viper_helios.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=c/c4/BK_CD_Skyress.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=5/58/BK_CD_Tigrerra.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=1/1b/BK_CD_Naga_2.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <img src="/bkimg?p=7/72/SpectraPh.png" alt="" loading="lazy" onerror="this.style.display='none'">
+    </div>
+  </div>
+
+  <!-- ══ TRUST BAR ══ -->
+  <div class="trust-bar">
+    <div class="container trust-bar-inner">
+      <div class="trust-item">⭐⭐⭐⭐⭐ <strong>דירוג 5/5</strong> מהקהילה</div>
+      <div class="trust-item">📦 <strong>משלוח מהיר</strong> לכל הארץ</div>
+      <div class="trust-item">✅ <strong>בקוגן מקוריים</strong> בלבד</div>
+      <div class="trust-item">🇮🇱 <strong>חנות ישראלית</strong> מקומית</div>
+    </div>
+  </div>
+
+  <!-- ══ WHY WUSHWUSH ══ -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-label">למה WushWush Games?</span>
+        <h2 class="section-title">החנות שה<span>קהילה בחרה</span></h2>
+        <p class="section-desc">עשרות חברי קהילת בקוגן ישראל כבר הזמינו מ-WushWush Games וממליצים בחום</p>
+      </div>
+      <div class="why-grid">
+        <div class="why-card">
+          <div class="why-icon">🏆</div>
+          <div class="why-title">מוצרים מקוריים</div>
+          <div class="why-desc">כל הבקוגן הם מקוריים ומוסמכים – לא נוקרות, לא זיופים. רק מוצרים אמיתיים ברמה הגבוהה ביותר.</div>
+        </div>
+        <div class="why-card">
+          <div class="why-icon">🚀</div>
+          <div class="why-title">משלוח מהיר</div>
+          <div class="why-desc">משלוח מהיר לכל רחבי ישראל. ההזמנה שלך יוצאת אליך תוך ימים ספורים ישירות עד הדלת.</div>
+        </div>
+        <div class="why-card">
+          <div class="why-icon">💬</div>
+          <div class="why-title">מוכר קהילתי</div>
+          <div class="why-desc">WushWush Games הוא חלק מקהילת בקוגן ישראל. הם מכירים את המשחק, את הדמויות ואת מה שאתה צריך.</div>
+        </div>
+        <div class="why-card">
+          <div class="why-icon">💰</div>
+          <div class="why-title">מחירים הוגנים</div>
+          <div class="why-desc">מחירים תחרותיים עם ערך אמיתי לכסף שלך. מגוון רחב מכל עונות הסדרה ובכל טווחי המחיר.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ PRODUCT SHOWCASE ══ -->
+  <section class="section" style="background:var(--bg-secondary)">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-label">מה תמצאו בחנות</span>
+        <h2 class="section-title">בקוגן מ<span>כל העונות</span></h2>
+        <p class="section-desc">מ-Drago הקלאסי ועד Titanium Dragonoid – תמצאו הכל ב-WushWush Games</p>
+      </div>
+      <div class="product-grid">
+        <a href="https://wush.games/collection?handle=bakugan" target="_blank" rel="noopener" class="product-card">
+          <img class="product-img" src="/bkimg?p=f/fb/Fusion_Dragonoid_Appears.jpg" alt="Drago" loading="lazy" onerror="this.style.background='linear-gradient(135deg,#1a0500,#3a1000)';this.style.display='block'">
+          <div class="product-body">
+            <div class="product-name">Dragonoid</div>
+            <div class="product-attr">PYRUS · עונה 1–4</div>
+            <div class="product-avail">✅ זמין בחנות</div>
+          </div>
+        </a>
+        <a href="https://wush.games/collection?handle=bakugan" target="_blank" rel="noopener" class="product-card">
+          <img class="product-img" src="/bkimg?p=d/d3/Viper_helios.png" alt="Helios" loading="lazy" onerror="this.style.background='linear-gradient(135deg,#1a0500,#5a1500)';this.style.display='block'">
+          <div class="product-body">
+            <div class="product-name">Viper Helios</div>
+            <div class="product-attr">PYRUS · עונה 2</div>
+            <div class="product-avail">✅ זמין בחנות</div>
+          </div>
+        </a>
+        <a href="https://wush.games/collection?handle=bakugan" target="_blank" rel="noopener" class="product-card">
+          <img class="product-img" src="/bkimg?p=d/de/BK_Linehalt.png" alt="Linehalt" loading="lazy" onerror="this.style.background='linear-gradient(135deg,#120028,#350070)';this.style.display='block'">
+          <div class="product-body">
+            <div class="product-name">Linehalt</div>
+            <div class="product-attr">DARKUS · עונה 3</div>
+            <div class="product-avail">✅ זמין בחנות</div>
+          </div>
+        </a>
+        <a href="https://wush.games/collection?handle=bakugan" target="_blank" rel="noopener" class="product-card">
+          <img class="product-img" src="/bkimg?p=c/c4/BK_CD_Skyress.jpg" alt="Skyress" loading="lazy" onerror="this.style.background='linear-gradient(135deg,#001a00,#004400)';this.style.display='block'">
+          <div class="product-body">
+            <div class="product-name">Skyress</div>
+            <div class="product-attr">VENTUS · עונה 1</div>
+            <div class="product-avail">✅ זמין בחנות</div>
+          </div>
+        </a>
+        <a href="https://wush.games/collection?handle=bakugan" target="_blank" rel="noopener" class="product-card">
+          <img class="product-img" src="/bkimg?p=5/58/BK_CD_Tigrerra.jpg" alt="Tigrerra" loading="lazy" onerror="this.style.background='linear-gradient(135deg,#1a1500,#3a3000)';this.style.display='block'">
+          <div class="product-body">
+            <div class="product-name">Blade Tigrerra</div>
+            <div class="product-attr">HAOS · עונה 1</div>
+            <div class="product-avail">✅ זמין בחנות</div>
+          </div>
+        </a>
+        <a href="https://wush.games/collection?handle=bakugan" target="_blank" rel="noopener" class="product-card">
+          <img class="product-img" src="/bkimg?p=c/cf/BK_CD_Gorem.jpg" alt="Gorem" loading="lazy" onerror="this.style.background='linear-gradient(135deg,#1a0800,#442000)';this.style.display='block'">
+          <div class="product-body">
+            <div class="product-name">Stone Gorem</div>
+            <div class="product-attr">SUBTERRA · עונה 1</div>
+            <div class="product-avail">✅ זמין בחנות</div>
+          </div>
+        </a>
+        <a href="https://wush.games/collection?handle=bakugan" target="_blank" rel="noopener" class="product-card">
+          <img class="product-img" src="/bkimg?p=6/66/BK_CD_Preyas.jpg" alt="Preyas" loading="lazy" onerror="this.style.background='linear-gradient(135deg,#001228,#003366)';this.style.display='block'">
+          <div class="product-body">
+            <div class="product-name">Preyas</div>
+            <div class="product-attr">AQUOS · עונה 1</div>
+            <div class="product-avail">✅ זמין בחנות</div>
+          </div>
+        </a>
+        <a href="https://wush.games/collection?handle=bakugan" target="_blank" rel="noopener" class="product-card">
+          <img class="product-img" src="/bkimg?p=d/d4/Dan_in_Mechtanium_Surge.png" alt="Dan S4" loading="lazy" onerror="this.style.background='linear-gradient(135deg,#1a0500,#3a1000)';this.style.display='block'">
+          <div class="product-body">
+            <div class="product-name">Titanium Dragonoid</div>
+            <div class="product-attr">PYRUS · עונה 4</div>
+            <div class="product-avail">✅ זמין בחנות</div>
+          </div>
+        </a>
+      </div>
+      <div style="text-align:center;margin-top:2rem">
+        <a href="https://wush.games/collection?handle=bakugan" target="_blank" rel="noopener" class="btn btn-primary btn-lg">
+          לכל הבקוגן בחנות ←
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ COMMUNITY REVIEWS ══ -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-label">חברי הקהילה אומרים</span>
+        <h2 class="section-title">ביקורות <span>אמיתיות</span></h2>
+        <p class="section-desc">חברי קהילת בקוגן ישראל שהזמינו ושיתפו את חוויותיהם</p>
+      </div>
+      <div class="reviews-grid">
+        <div class="review-card">
+          <div class="review-stars">★★★★★</div>
+          <div class="review-text">"הזמנתי Drago מקורי מ-WushWush ותוך 3 ימים זה הגיע. האריזה הייתה מושלמת והמוצר חדש לגמרי. ממליץ בחום לכל חובב בקוגן!"</div>
+          <div class="review-author">
+            <div class="review-avatar" style="background:linear-gradient(135deg,#FF4500,#ff8c00)">ד</div>
+            <div>
+              <div class="review-name">דניאל מ. 🔥</div>
+              <div class="review-meta">חבר קהילה · פיירוס</div>
+            </div>
+          </div>
+        </div>
+        <div class="review-card">
+          <div class="review-stars">★★★★★</div>
+          <div class="review-text">"סוף סוף חנות ישראלית שמבינה מה זה בקוגן. קניתי סט שלם של עונה 2 ואפשר לראות שהמוכר גם אוהב את הסדרה. השירות מעולה!"</div>
+          <div class="review-author">
+            <div class="review-avatar" style="background:linear-gradient(135deg,#0088FF,#00ccff)">י</div>
+            <div>
+              <div class="review-name">יונתן ש. 💧</div>
+              <div class="review-meta">חבר קהילה · אקווס</div>
+            </div>
+          </div>
+        </div>
+        <div class="review-card">
+          <div class="review-stars">★★★★★</div>
+          <div class="review-text">"ילדי ביקש Helios לחגיגת יום הולדת ולא מצאתי בשום מקום. WushWush Games היו הפתרון – מחיר סביר, מקורי ומשלוח מהיר. תודה!"</div>
+          <div class="review-author">
+            <div class="review-avatar" style="background:linear-gradient(135deg,#9B00FF,#cc44ff)">מ</div>
+            <div>
+              <div class="review-name">מיכל ל. ✨</div>
+              <div class="review-meta">חברת קהילה · האוס</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ FINAL CTA ══ -->
+  <section class="section" style="background:var(--bg-secondary)">
+    <div class="container">
+      <div class="store-final-cta">
+        <div style="display:flex;justify-content:center;gap:0.75rem;margin-bottom:1.25rem;flex-wrap:wrap">
+          <img src="/bkimg?p=f/fb/Fusion_Dragonoid_Appears.jpg" loading="lazy" onerror="this.style.display='none'" alt=""
+            style="height:72px;width:72px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,69,0,0.5)">
+          <img src="/bkimg?p=d/d3/Viper_helios.png" loading="lazy" onerror="this.style.display='none'" alt=""
+            style="height:72px;width:72px;border-radius:50%;object-fit:cover;border:2px solid rgba(0,136,255,0.5)">
+          <img src="/bkimg?p=d/de/BK_Linehalt.png" loading="lazy" onerror="this.style.display='none'" alt=""
+            style="height:72px;width:72px;border-radius:50%;object-fit:cover;border:2px solid rgba(155,0,255,0.5)">
+          <img src="/bkimg?p=5/58/BK_CD_Tigrerra.jpg" loading="lazy" onerror="this.style.display='none'" alt=""
+            style="height:72px;width:72px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,215,0,0.5)">
+          <img src="/bkimg?p=c/c4/BK_CD_Skyress.jpg" loading="lazy" onerror="this.style.display='none'" alt=""
+            style="height:72px;width:72px;border-radius:50%;object-fit:cover;border:2px solid rgba(0,204,68,0.5)">
+        </div>
+        <h2 class="section-title" style="margin-bottom:0.75rem">מוכן לקנות? <span>הכנס לחנות</span></h2>
+        <p style="color:var(--text-secondary);max-width:480px;margin:0 auto 1.75rem;font-size:0.95rem;line-height:1.65">
+          כל הבקוגן שאתה רוצה – בקליק אחד. WushWush Games מחכים לך עם המגוון הרחב ביותר בישראל.
+        </p>
+        <a href="https://wush.games/collection?handle=bakugan" target="_blank" rel="noopener" class="store-cta-btn" style="font-size:1.1rem;padding:1rem 2.5rem">
+          🛒 לחנות WushWush Games
+        </a>
+        <p style="margin-top:1rem;font-size:0.8rem;color:var(--text-muted)">wush.games · חנות ישראלית מקומית · בקוגן מקוריים</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <p>© 2026 בקוגן ישראל · <a href="https://wush.games/collection?handle=bakugan" target="_blank" rel="noopener" style="color:var(--accent)">WushWush Games</a></p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>
