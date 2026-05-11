@@ -60,7 +60,7 @@ app.use('/api', apiLimiter);
 
 app.use(express.json({ limit: '2mb' }));
 app.use(express.static(path.join(__dirname, 'public'), {
-  maxAge: isProd ? '1d' : 0,
+  maxAge: isProd ? '5m' : 0,
 }));
 
 // ─── Health check for Railway ───
