@@ -132,7 +132,23 @@ async function updateNotificationBadges() {
 }
 
 function toggleMobileMenu() {
-  document.getElementById('mobile-menu')?.classList.toggle('open');
+  const m = document.getElementById('mobile-menu');
+  if (!m) return;
+  m.classList.toggle('open');
+  // Close when tapping outside
+  if (m.classList.contains('open')) {
+    const close = (e) => {
+      if (!m.contains(e.target) && !document.getElementById('hamburger')?.contains(e.target)) {
+        m.classList.remove('open');
+        document.removeEventListener('touchstart', close);
+        document.removeEventListener('click', close);
+      }
+    };
+    setTimeout(() => {
+      document.addEventListener('touchstart', close, { passive: true });
+      document.addEventListener('click', close);
+    }, 50);
+  }
 }
 
 // ─── Bottom nav (mobile app-style) ───
@@ -151,8 +167,9 @@ function renderBottomNav() {
   const items = [
     { href: '/',        icon: '🌀', label: 'בית' },
     { href: '/forums',  icon: '💬', label: 'פורום' },
-    { href: '/wiki',    icon: '📖', label: 'ויקי' },
+    { href: '/store',   icon: '🛒', label: 'חנות' },
     { href: '/events',  icon: '🏆', label: 'אירועים' },
+    { href: '/wiki',    icon: '📖', label: 'ויקי' },
     { href: loggedIn ? '/profile' : '/login', icon: loggedIn ? '👤' : '🔑', label: loggedIn ? 'פרופיל' : 'כניסה' },
   ];
 
