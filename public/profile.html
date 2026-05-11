@@ -32,6 +32,27 @@
 
     const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
+    const ATTRS = [
+      { id:'pyrus',    label:'🔥 פיירוס',  color:'#FF4500' },
+      { id:'aquos',    label:'💧 אקווס',   color:'#0088FF' },
+      { id:'darkus',   label:'🌑 דארקוס',  color:'#9B00FF' },
+      { id:'haos',     label:'✨ האוס',     color:'#FFD700' },
+      { id:'ventus',   label:'🌪️ ונטוס',  color:'#00CC44' },
+      { id:'subterra', label:'🪨 סאבטרה',  color:'#CC6600' },
+    ];
+
+    function attrBadgeHtml(attr) {
+      const a = ATTRS.find(x => x.id === attr);
+      if (!a) return '';
+      return `<span class="attr-badge ${a.id}">${a.label}</span>`;
+    }
+
+    function attrBannerGradient(attr) {
+      const colors = { pyrus:'255,69,0', aquos:'0,136,255', darkus:'155,0,255', haos:'255,215,0', ventus:'0,204,68', subterra:'204,102,0' };
+      const c = colors[attr] || '255,102,0';
+      return `linear-gradient(135deg,rgba(${c},0.35),rgba(139,0,255,0.2))`;
+    }
+
     async function loadProfile() {
       try {
         const user = await apiFetch('/auth/me');
@@ -45,12 +66,13 @@
       const roleLabel = { admin: 'מנהל 👑', moderator: 'מנחה 🛡️', user: 'חבר' }[user.role] || 'חבר';
       document.getElementById('profile-container').innerHTML = `
         <div class="profile-card">
-          <div class="profile-banner" style="background:linear-gradient(135deg,rgba(255,69,0,0.3),rgba(139,0,255,0.3))">
+          <div class="profile-banner" style="background:${attrBannerGradient(user.attribute)}">
             <div class="profile-avatar-wrap">${user.avatar ? `<img src="${esc(user.avatar)}" alt="">` : esc(user.username[0])}</div>
           </div>
           <div class="profile-info">
             <div class="profile-username">${esc(user.username)}</div>
             <span class="profile-role role-${user.role}">${roleLabel}</span>
+            ${user.attribute ? attrBadgeHtml(user.attribute) : ''}
             <p class="profile-bio">${esc(user.bio || 'אין תיאור עדיין...')}</p>
             <div class="profile-stats">
               <div class="profile-stat"><strong>${user.threadCount}</strong><span>שרשורים</span></div>
@@ -79,7 +101,15 @@
             </div>
             <div class="form-group">
               <label class="form-label">URL תמונת פרופיל</label>
-              <input type="url" id="edit-avatar" class="form-input" placeholder="https://..." value="${user.avatar || ''}" dir="ltr">
+              <input type="url" id="edit-avatar" class="form-input" placeholder="https://..." value="${esc(user.avatar || '')}" dir="ltr">
+            </div>
+            <div class="form-group">
+              <label class="form-label">התכונה שלי ⚡</label>
+              <div class="attr-picker">
+                ${ATTRS.map(a => `<button type="button" class="attr-pick-btn${user.attribute===a.id?' active':''}" style="--ab-color:${a.color}" onclick="selectAttr('${a.id}',this)">${a.label}</button>`).join('')}
+                <button type="button" class="attr-pick-btn${!user.attribute?' active':''}" style="--ab-color:var(--text-muted)" onclick="selectAttr('',this)">❌ ללא</button>
+              </div>
+              <input type="hidden" id="edit-attribute" value="${esc(user.attribute || '')}">
             </div>
             <div id="settings-msg" class="hidden"></div>
             <button class="btn btn-primary mt-2" onclick="saveSettings()">שמור שינויים</button>
@@ -117,12 +147,19 @@
       } catch {}
     }
 
+    function selectAttr(id, btn) {
+      document.getElementById('edit-attribute').value = id;
+      document.querySelectorAll('.attr-pick-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
     async function saveSettings() {
       const bio = document.getElementById('edit-bio').value;
       const avatar = document.getElementById('edit-avatar').value;
+      const attribute = document.getElementById('edit-attribute')?.value || '';
       const msgEl = document.getElementById('settings-msg');
       try {
-        await apiFetch('/auth/me', { method: 'PUT', body: { bio, avatar } });
+        await apiFetch('/auth/me', { method: 'PUT', body: { bio, avatar, attribute } });
         const user = Auth.getUser();
         Auth.setAuth(Auth.getToken(), { ...user, bio, avatar });
         msgEl.className = 'form-success';

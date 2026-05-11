@@ -138,6 +138,9 @@ function initDB() {
     );
   `);
 
+  // Safe migration: add attribute column if not already present
+  try { db.exec(`ALTER TABLE users ADD COLUMN attribute TEXT DEFAULT ''`); } catch(e) {}
+
   // Delete all test content created by admin users (seeded data) — no-op once cleaned
   db.exec(`
     DELETE FROM forum_posts WHERE thread_id IN (

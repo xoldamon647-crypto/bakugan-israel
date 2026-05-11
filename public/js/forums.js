@@ -2,6 +2,15 @@ let categories = [];
 let currentCategoryId = null;
 let currentPage = 1;
 
+const CAT_CHARS = [
+  { img: '/bkimg?p=f/fb/Fusion_Dragonoid_Appears.jpg', color: '#FF4500' },
+  { img: '/bkimg?p=d/d3/Viper_helios.png',             color: '#0088FF' },
+  { img: '/bkimg?p=d/de/BK_Linehalt.png',              color: '#9B00FF' },
+  { img: '/bkimg?p=5/58/BK_CD_Tigrerra.jpg',           color: '#FFD700' },
+  { img: '/bkimg?p=c/c4/BK_CD_Skyress.jpg',            color: '#00CC44' },
+  { img: '/bkimg?p=c/cf/BK_CD_Gorem.jpg',              color: '#CC6600' },
+];
+
 async function loadCategories() {
   try {
     categories = await apiFetch('/forums/categories');
@@ -24,19 +33,23 @@ async function loadCategories() {
       catEl.innerHTML = '<div class="empty-state"><div class="icon">💬</div><p>אין קטגוריות עדיין</p></div>';
       return;
     }
-    catEl.innerHTML = categories.map(c => `
-      <div class="forum-category-card" onclick="showThreads(${c.id}, '${c.name}')">
-        <div class="category-icon">${c.icon}</div>
-        <div class="category-info">
-          <div class="category-name">${c.name}</div>
-          <div class="category-desc">${c.description}</div>
+    catEl.innerHTML = categories.map((c, i) => {
+      const char = CAT_CHARS[i % CAT_CHARS.length];
+      return `
+        <div class="forum-category-card" onclick="showThreads(${c.id}, '${c.name}')"
+             style="--cat-color:${char.color};--cat-bg-img:url('${char.img}')">
+          <div class="category-icon">${c.icon}</div>
+          <div class="category-info">
+            <div class="category-name">${c.name}</div>
+            <div class="category-desc">${c.description}</div>
+          </div>
+          <div class="category-stats">
+            <strong>${c.thread_count}</strong>
+            שרשורים
+          </div>
         </div>
-        <div class="category-stats">
-          <strong>${c.thread_count}</strong>
-          שרשורים
-        </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
 
     loadRecentThreadsSidebar();
     setupNewThreadCatSelect();

@@ -83,7 +83,7 @@ router.post('/reset-password', (req, res) => {
 });
 
 router.get('/me', authMiddleware, (req, res) => {
-  const user = db.prepare('SELECT id, username, email, role, avatar, bio, created_at, last_seen FROM users WHERE id = ?').get(req.user.id);
+  const user = db.prepare('SELECT id, username, email, role, avatar, bio, attribute, created_at, last_seen FROM users WHERE id = ?').get(req.user.id);
   if (!user) return res.status(404).json({ error: 'משתמש לא נמצא' });
 
   const postCount = db.prepare('SELECT COUNT(*) as c FROM forum_posts WHERE user_id = ?').get(req.user.id)?.c || 0;
@@ -93,8 +93,10 @@ router.get('/me', authMiddleware, (req, res) => {
 });
 
 router.put('/me', authMiddleware, (req, res) => {
-  const { bio, avatar } = req.body;
-  db.prepare('UPDATE users SET bio = ?, avatar = ? WHERE id = ?').run(bio || '', avatar || '', req.user.id);
+  const { bio, avatar, attribute } = req.body;
+  const validAttributes = ['pyrus','aquos','darkus','haos','ventus','subterra',''];
+  const safeAttr = validAttributes.includes(attribute) ? attribute : '';
+  db.prepare('UPDATE users SET bio = ?, avatar = ?, attribute = ? WHERE id = ?').run(bio || '', avatar || '', safeAttr, req.user.id);
   res.json({ success: true });
 });
 
