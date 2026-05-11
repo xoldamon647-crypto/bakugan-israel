@@ -821,24 +821,27 @@
         },
         events: {
           onReady: e => {
+            e.target.mute();
             e.target.setVolume(0);
             e.target.playVideo();
-            document.getElementById('video-bg').style.opacity = '1';
           },
           onStateChange: e => {
             if (e.data === YT.PlayerState.PLAYING) {
-              document.getElementById('video-bg').style.transition = 'opacity 1s';
-              document.getElementById('video-bg').style.opacity = '1';
-              // Fade out the opaque fallback so the actual video shows through
+              const bg = document.getElementById('video-bg');
+              bg.style.transition = 'opacity 1.2s';
+              bg.style.opacity = '1';
               const fb = document.querySelector('.hero-bg-fallback');
-              if (fb) { fb.style.opacity = '0'; }
+              if (fb) { fb.style.transition = 'opacity 1.2s'; fb.style.opacity = '0'; }
             }
-            if (e.data === YT.PlayerState.CUED || e.data === -1) e.target.playVideo();
+            // Keep looping
+            if (e.data === YT.PlayerState.ENDED || e.data === YT.PlayerState.CUED || e.data === -1) {
+              try { e.target.playVideo(); } catch {}
+            }
           },
           onError: () => {
             currentVideoIndex++;
             if (currentVideoIndex < VIDEO_IDS.length) {
-              setTimeout(() => createPlayer(VIDEO_IDS[currentVideoIndex]), 300);
+              setTimeout(() => createPlayer(VIDEO_IDS[currentVideoIndex]), 500);
             }
           }
         }
@@ -846,21 +849,23 @@
     }
 
     const soundBtn = document.getElementById('sound-btn');
-    soundBtn.addEventListener('click', () => {
+    function toggleSound() {
       if (!ytPlayer || typeof ytPlayer.unMute !== 'function') return;
       if (isMuted) {
         ytPlayer.unMute(); ytPlayer.setVolume(80);
         soundBtn.textContent = '🔊';
         soundBtn.style.borderColor = 'var(--accent)';
-        soundBtn.style.boxShadow = '0 0 12px var(--accent-glow)';
+        soundBtn.style.boxShadow = '0 0 12px rgba(255,102,0,0.6)';
       } else {
-        ytPlayer.mute();
+        ytPlayer.mute(); ytPlayer.setVolume(0);
         soundBtn.textContent = '🔇';
         soundBtn.style.borderColor = '';
         soundBtn.style.boxShadow = '';
       }
       isMuted = !isMuted;
-    });
+    }
+    soundBtn.addEventListener('click', toggleSound);
+    soundBtn.addEventListener('touchend', e => { e.preventDefault(); toggleSound(); });
 
     function initEnergyRings() {
       const container = document.getElementById('energy-rings');
@@ -876,8 +881,8 @@
 
     const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
-    // Skip heavy YouTube hero on mobile — fallback gradient looks great
-    if (window.matchMedia('(min-width:768px)').matches) loadYouTube();
+    // Load YouTube on all devices — mobile needs playsinline for iOS autoplay
+    loadYouTube();
 
     fetch('/api/auth/stats').then(r=>r.json()).then(d=>{
       document.getElementById('stat-users').textContent = d.users;
