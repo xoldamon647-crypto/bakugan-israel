@@ -196,29 +196,6 @@
       </div>
   </div>
 
-  <!-- ══ QUICK ACTIONS ══ -->
-  <section class="latest-grid section">
-    <div class="section-inner">
-      <div class="section-inner-header">
-        <div class="section-inner-title">⚡ פעילות אחרונה</div>
-        <a href="/forums" class="btn btn-sm btn-secondary">לפורום ←</a>
-      </div>
-      <div id="recent-threads" class="recent-threads">
-        <div class="spinner"></div>
-      </div>
-    </div>
-
-    <div class="section-inner">
-      <div class="section-inner-header">
-        <div class="section-inner-title">🏆 אירועים קרובים</div>
-        <a href="/events" class="btn btn-sm btn-secondary">לכל האירועים ←</a>
-      </div>
-      <div id="upcoming-events" class="upcoming-events">
-        <div class="spinner"></div>
-      </div>
-    </div>
-  </section>
-
   <!-- ══ ATTRIBUTES with real Bakugan images ══ -->
   <section class="section" style="background:var(--bg-secondary);position:relative;overflow:hidden">
     <div class="container">
@@ -611,14 +588,14 @@
             <div class="section-inner-title">💬 שרשורים אחרונים</div>
             <a href="/forums" class="btn btn-sm btn-outline">כל הפורום →</a>
           </div>
-          <div id="latest-threads"><div class="spinner"></div></div>
+          <div id="recent-threads"><div class="spinner"></div></div>
         </div>
         <div class="section-inner">
           <div class="section-inner-header">
             <div class="section-inner-title">🏆 אירועים קרובים</div>
             <a href="/events" class="btn btn-sm btn-outline">כל האירועים →</a>
           </div>
-          <div id="latest-events"><div class="spinner"></div></div>
+          <div id="upcoming-events"><div class="spinner"></div></div>
         </div>
       </div>
     </div>
@@ -803,7 +780,10 @@
       }
     }
 
-    loadYouTube();
+    const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+    // Skip heavy YouTube hero on mobile — fallback gradient looks great
+    if (window.matchMedia('(min-width:768px)').matches) loadYouTube();
 
     fetch('/api/auth/stats').then(r=>r.json()).then(d=>{
       document.getElementById('stat-users').textContent = d.users;
@@ -818,8 +798,8 @@
         <div class="latest-thread" onclick="location.href='/thread?id=${t.id}'">
           <div class="lt-icon">${t.is_pinned?'📌':'💬'}</div>
           <div class="lt-info">
-            <div class="lt-title">${t.title}</div>
-            <div class="lt-meta">${t.username} · ${timeAgo(t.created_at)} · ${t.category_name}</div>
+            <div class="lt-title">${esc(t.title)}</div>
+            <div class="lt-meta">${esc(t.username)} · ${timeAgo(t.created_at)} · ${esc(t.category_name)}</div>
           </div>
         </div>`).join('');
     }).catch(()=>{});
@@ -834,10 +814,10 @@
             <div class="event-status status-${e.status}">קרוב</div>
           </div>
           <div class="event-body">
-            <div class="event-title" style="font-size:0.9rem">${e.title}</div>
+            <div class="event-title" style="font-size:0.9rem">${esc(e.title)}</div>
             <div class="event-meta">
               <div class="event-meta-item">📅 ${formatEventDate(e.event_date)}</div>
-              ${e.location ? `<div class="event-meta-item">📍 ${e.location}</div>` : ''}
+              ${e.location ? `<div class="event-meta-item">📍 ${esc(e.location)}</div>` : ''}
             </div>
           </div>
         </div>`).join('');

@@ -4,10 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>פרופיל – בקוגן ישראל</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="/css/style.css">
   <style>
     .profile-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 2rem; }
-    .profile-tabs { display: flex; gap: 0.25rem; border-bottom: 1px solid var(--border); padding: 0 1.5rem; background: var(--bg-card); }
+    .profile-tabs { display: flex; gap: 0.25rem; border-bottom: 1px solid var(--border); padding: 0 1.5rem; background: var(--bg-card); overflow-x: auto; -webkit-overflow-scrolling: touch; }
     .profile-tab { padding: 1rem 1.25rem; border-bottom: 2px solid transparent; color: var(--text-secondary); cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: var(--transition); }
     .profile-tab.active { border-bottom-color: var(--accent); color: var(--accent); }
     .profile-tab-content { display: none; padding: 1.5rem; }
@@ -28,6 +30,8 @@
   <script>
     if (!Auth.isLoggedIn()) window.location.href = '/login';
 
+    const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
     async function loadProfile() {
       try {
         const user = await apiFetch('/auth/me');
@@ -42,12 +46,12 @@
       document.getElementById('profile-container').innerHTML = `
         <div class="profile-card">
           <div class="profile-banner" style="background:linear-gradient(135deg,rgba(255,69,0,0.3),rgba(139,0,255,0.3))">
-            <div class="profile-avatar-wrap">${user.avatar ? `<img src="${user.avatar}" alt="">` : user.username[0]}</div>
+            <div class="profile-avatar-wrap">${user.avatar ? `<img src="${esc(user.avatar)}" alt="">` : esc(user.username[0])}</div>
           </div>
           <div class="profile-info">
-            <div class="profile-username">${user.username}</div>
+            <div class="profile-username">${esc(user.username)}</div>
             <span class="profile-role role-${user.role}">${roleLabel}</span>
-            <p class="profile-bio">${user.bio || 'אין תיאור עדיין...'}</p>
+            <p class="profile-bio">${esc(user.bio || 'אין תיאור עדיין...')}</p>
             <div class="profile-stats">
               <div class="profile-stat"><strong>${user.threadCount}</strong><span>שרשורים</span></div>
               <div class="profile-stat"><strong>${user.postCount}</strong><span>תגובות</span></div>
@@ -71,7 +75,7 @@
             <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:1.5rem">עריכת פרופיל</h3>
             <div class="form-group">
               <label class="form-label">ביוגרפיה</label>
-              <textarea id="edit-bio" class="form-input" rows="4" placeholder="ספר על עצמך...">${user.bio || ''}</textarea>
+              <textarea id="edit-bio" class="form-input" rows="4" placeholder="ספר על עצמך...">${esc(user.bio || '')}</textarea>
             </div>
             <div class="form-group">
               <label class="form-label">URL תמונת פרופיל</label>

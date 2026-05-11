@@ -682,6 +682,20 @@ body{
 .char-mini-img-wrap .ball-mini{position:absolute;top:0;left:0;width:100%!important;height:100%!important;margin:0!important}
 .char-mini-img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;object-position:top;border-radius:50%;z-index:1;border:2px solid var(--border-accent)}
 
+/* ── WIKI PAGE VIEW LAYOUT ── */
+.wiki-layout{display:grid;grid-template-columns:220px 1fr;gap:1.5rem;align-items:start}
+.wiki-content-area{min-width:0}
+.wiki-back{display:inline-flex;align-items:center;gap:0.45rem;color:var(--text-secondary);cursor:pointer;font-size:0.88rem;padding:0.4rem 0.75rem;border-radius:var(--radius);border:1px solid var(--border);margin-bottom:1.5rem;transition:var(--tr)}
+.wiki-back:hover{color:var(--accent);border-color:rgba(255,102,0,0.4)}
+.wiki-nav{position:sticky;top:calc(var(--nav-height) + 1rem);background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:0.9rem;max-height:calc(100vh - var(--nav-height) - 2rem);overflow-y:auto}
+.wiki-nav-title{font-size:0.72rem;font-weight:700;letter-spacing:0.1em;color:var(--text-muted);text-transform:uppercase;padding:0.2rem 0.5rem;margin-bottom:0.5rem}
+.wiki-nav-item{padding:0.45rem 0.75rem;border-radius:var(--radius);cursor:pointer;font-size:0.84rem;color:var(--text-secondary);transition:var(--tr);border:1px solid transparent;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.wiki-nav-item:hover{background:var(--bg-card-hover);color:var(--text-primary)}
+.wiki-nav-item.active{background:rgba(255,102,0,0.1);color:var(--accent);border-color:rgba(255,102,0,0.25)}
+.wiki-page-header{margin-bottom:1.5rem}
+.wiki-page-title{font-size:1.8rem;font-weight:900;margin-bottom:0.4rem;line-height:1.2}
+.wiki-page-meta{font-size:0.82rem;color:var(--text-secondary);display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap}
+
 /* ── RULES ── */
 .rules-intro{background:linear-gradient(135deg,rgba(255,69,0,0.07),rgba(155,0,255,0.07));border:1px solid var(--border-accent);border-radius:var(--radius-lg);padding:1.75rem;margin-bottom:2rem;text-align:center}
 .rules-seasons{display:flex;gap:0.6rem;flex-wrap:wrap;margin-bottom:1.75rem}
@@ -875,10 +889,14 @@ textarea.form-input{resize:vertical;min-height:110px}
 @media(max-width:600px){.wiki-infobox{float:none;margin-right:0;max-width:100%}}
 
 /* ── RESPONSIVE ── */
-/* prevent any element from causing horizontal scroll */
 *,*::before,*::after{box-sizing:border-box}
 html,body{max-width:100%;overflow-x:hidden}
 img{max-width:100%;height:auto}
+/* remove 300ms tap delay on all interactive elements */
+a,button,input,select,textarea,[role="button"]{touch-action:manipulation}
+
+/* ── BOTTOM NAV (mobile app-style) ── */
+.bottom-nav{display:none}
 
 @media(max-width:900px){
   .season-row{grid-template-columns:1fr}
@@ -889,58 +907,153 @@ img{max-width:100%;height:auto}
   .stats-grid{grid-template-columns:repeat(2,1fr)}
   table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
 }
+
 @media(max-width:768px){
-  html{font-size:14px}
+  /* ── base ── */
+  html{font-size:15px}
+  body{padding-bottom:calc(64px + env(safe-area-inset-bottom,0px))}
+
+  /* ── bottom nav ── */
+  .bottom-nav{
+    display:flex;
+    position:fixed;bottom:0;left:0;right:0;z-index:1100;
+    background:rgba(6,6,16,0.97);
+    border-top:1px solid rgba(255,102,0,0.25);
+    backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  .bottom-nav a{
+    flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:0.18rem;padding:0.55rem 0.25rem;
+    text-decoration:none;color:var(--text-secondary);
+    font-size:0.6rem;font-family:'Heebo',sans-serif;font-weight:600;
+    transition:color 0.2s;min-height:56px;position:relative;
+  }
+  .bottom-nav a .bn-icon{font-size:1.4rem;line-height:1;display:block}
+  .bottom-nav a.active{color:var(--accent)}
+  .bottom-nav a.active .bn-icon{filter:drop-shadow(0 0 6px var(--accent-glow))}
+  .bottom-nav a.active::after{
+    content:'';position:absolute;top:0;left:20%;right:20%;
+    height:2px;background:var(--accent);border-radius:0 0 2px 2px;
+  }
+  .bn-badge{
+    position:absolute;top:6px;right:calc(50% - 16px);
+    background:var(--accent);color:#000;font-size:0.55rem;font-weight:800;
+    min-width:16px;height:16px;border-radius:8px;
+    display:flex;align-items:center;justify-content:center;padding:0 3px;
+  }
+  .bn-badge.hidden{display:none}
+
+  /* ── navbar ── */
   .nav-links,.nav-auth .btn{display:none}
   .hamburger{display:flex}
-  .mobile-menu{position:fixed;top:var(--nav-height);right:0;left:0;bottom:0;background:var(--bg-secondary);z-index:999;padding:1.25rem;display:flex;flex-direction:column;gap:0.4rem;transform:translateX(100%);transition:var(--tr)}
+  .mobile-menu{
+    position:fixed;top:var(--nav-height);right:0;left:0;
+    bottom:calc(64px + env(safe-area-inset-bottom,0px));
+    background:rgba(6,6,16,0.98);backdrop-filter:blur(20px);
+    z-index:999;padding:1rem;
+    display:flex;flex-direction:column;gap:0.3rem;
+    transform:translateX(100%);transition:transform 0.3s cubic-bezier(0.4,0,0.2,1);
+    overflow-y:auto;
+  }
   .mobile-menu.open{transform:translateX(0)}
-  .mobile-menu a{display:flex;align-items:center;gap:0.65rem;padding:0.9rem;color:var(--text-primary);text-decoration:none;border-radius:var(--radius);font-size:1.05rem;font-weight:600}
-  .mobile-menu a:hover{background:var(--bg-card)}
+  .mobile-menu a{
+    display:flex;align-items:center;gap:0.75rem;padding:0.85rem 1rem;
+    color:var(--text-primary);text-decoration:none;
+    border-radius:var(--radius);font-size:1rem;font-weight:600;
+    border:1px solid transparent;transition:var(--tr);
+  }
+  .mobile-menu a:active{background:var(--bg-card);border-color:var(--border-accent)}
+
+  /* ── page banner ── */
+  .page-banner{height:150px}
+  .page-banner-title{font-size:1.45rem}
+  .page-banner-subtitle{font-size:0.82rem}
+
+  /* ── hide perf-heavy decorations ── */
+  .ambient-video-wrap{display:none!important}
+  .wiki-float-bg{display:none!important}
+  .particle{display:none!important}
+  .hero-char-deco{display:none!important}
+
+  /* ── strip ── */
+  .bk-deco-strip{height:68px}
+  .bk-deco-strip-inner img{height:52px!important}
+
+  /* ── hero ── */
+  .hero-title{font-size:2.2rem;line-height:1.15}
+  .hero-subtitle{font-size:0.95rem}
+  .hero-buttons{flex-direction:column;align-items:stretch;gap:0.65rem}
+  .hero-buttons .btn{text-align:center;min-height:48px;font-size:0.95rem}
+  .hero-stats{gap:1rem;flex-wrap:wrap}
+
+  /* ── touch-friendly buttons ── */
+  .btn{min-height:44px}
+  .btn-sm{min-height:36px}
+
+  /* ── cards ── */
+  .card{padding:0.9rem}
+
+  /* ── sections ── */
+  .container{padding-left:0.85rem!important;padding-right:0.85rem!important}
+  .section{padding:2rem 0}
+
+  /* ── events ── */
   .events-grid{grid-template-columns:1fr}
+
+  /* ── wiki ── */
+  .wiki-layout{grid-template-columns:1fr}
+  .wiki-nav{position:static;max-height:160px;overflow-y:auto;margin-bottom:1rem}
+  .wiki-page-title{font-size:1.35rem}
   .wiki-seasons{grid-template-columns:repeat(2,1fr)}
-  .thread-stats{display:none}
-  .hero-stats{gap:1.25rem}
-  /* episodes */
-  .episodes-grid{grid-template-columns:1fr!important}
-  .ep-filters{flex-wrap:wrap;gap:0.5rem}
-  .ep-filters select,.ep-filters input{width:100%}
-  /* wiki char pages */
-  .wiki-infobox{float:none!important;margin-right:0!important;margin-left:0!important;max-width:100%!important;width:100%!important}
-  .wiki-char-img{max-width:200px!important}
-  .char-mini-img{width:60px!important;height:60px!important}
+  .wiki-infobox{float:none!important;margin:0 0 1rem!important;max-width:100%!important;width:100%!important}
+  .wiki-char-img{max-width:180px!important;margin:0 auto!important;display:block}
   .wiki-char-grid{grid-template-columns:repeat(2,1fr)!important}
-  /* rules page */
+
+  /* ── forums ── */
+  .thread-item{flex-wrap:wrap;gap:0.5rem}
+  .thread-stats{display:none}
+
+  /* ── episodes ── */
+  .episodes-grid{grid-template-columns:repeat(2,1fr)!important;gap:0.65rem}
+  .ep-season-tab{min-width:72px;padding:0.55rem 0.7rem}
+
+  /* ── rules ── */
   .rule-accordion{padding:0.85rem!important}
   .rule-body{padding:0.75rem!important}
-  /* season page panels */
+
+  /* ── season panels ── */
   .season-panel-bg{background-attachment:scroll!important}
-  .season-hero{padding:2rem 1rem!important}
-  /* forums */
-  .thread-item{flex-wrap:wrap;gap:0.5rem}
-  /* strip */
-  .strip-track{animation-duration:40s!important}
-  /* hero */
-  .hero-title{font-size:2.4rem}
-  .hero-subtitle{font-size:1rem}
-  .hero-buttons{flex-direction:column;align-items:stretch;gap:0.75rem}
-  .hero-buttons .btn{text-align:center}
-  /* page banner */
-  .page-banner-title{font-size:1.8rem}
-  /* container padding */
-  .container{padding-left:1rem!important;padding-right:1rem!important}
-  /* cards */
-  .card{padding:1rem}
+  .season-hero{padding:1.5rem 1rem!important}
+
+  /* ── auth ── */
+  .auth-card{margin:1rem;padding:1.5rem}
+  .form-input{min-height:48px;font-size:16px}/* 16px prevents iOS zoom */
+
+  /* ── modals ── */
+  .modal-content{margin:0.75rem;max-height:90dvh}
+
+  /* ── messages ── */
+  .messages-layout{grid-template-columns:1fr}
+  .conversations-list{display:none}
 }
+
 @media(max-width:480px){
   .attrs-grid{grid-template-columns:1fr}
   .wiki-seasons{grid-template-columns:1fr}
-  .auth-card{padding:1.5rem}
-  .hero-title{font-size:2rem}
-  .stats-grid{grid-template-columns:1fr}
-  .wiki-char-grid{grid-template-columns:1fr!important}
+  .hero-title{font-size:1.85rem}
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .wiki-char-grid{grid-template-columns:repeat(2,1fr)!important}
   .season-tabs{flex-wrap:wrap}
   .season-tab{flex:1 1 45%;text-align:center}
-  .data-table th,.data-table td{padding:0.5rem 0.6rem;font-size:0.8rem}
-  .strip-item img{height:60px!important}
+  .data-table th,.data-table td{padding:0.45rem 0.5rem;font-size:0.78rem}
+  .page-banner{height:125px}
+  .page-banner-title{font-size:1.25rem}
+  .episodes-grid{grid-template-columns:repeat(2,1fr)!important;gap:0.5rem}
+  .ep-card-title{font-size:0.74rem}
+}
+
+/* reduce motion for users who prefer it */
+@media(prefers-reduced-motion:reduce){
+  *{animation-duration:0.01ms!important;transition-duration:0.01ms!important}
 }

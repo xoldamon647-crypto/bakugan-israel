@@ -56,7 +56,14 @@
     }
     .message-send-btn:hover { transform: scale(1.1); }
     .empty-messages { text-align: center; padding: 3rem 1rem; color: var(--text-secondary); }
-    @media (max-width: 768px) { .messages-layout { grid-template-columns: 1fr; } .conversations-list { display: none; } }
+    @media (max-width: 768px) {
+      .messages-layout { grid-template-columns: 1fr; }
+      .conversations-list { display: none; }
+      .conversations-list.mobile-visible { display: block; }
+      #chat-area.mobile-hidden { display: none; }
+      .mobile-back-btn { display: inline-flex; align-items: center; gap: 0.4rem; color: var(--text-secondary); font-size: 0.88rem; padding: 0.4rem 0.75rem; border-radius: var(--radius); border: 1px solid var(--border); margin-bottom: 0.75rem; cursor: pointer; background: none; }
+    }
+    @media (min-width: 769px) { .mobile-back-btn { display: none; } }
   </style>
 </head>
 <body>
@@ -94,6 +101,8 @@
       }
     }
 
+    const isMobile = () => window.innerWidth < 768;
+
     function renderMessages() {
       if (!conversations.length) {
         document.getElementById('messages-container').innerHTML = `
@@ -106,23 +115,27 @@
         return;
       }
 
+      const showConvList = !currentUserId || !isMobile();
       document.getElementById('messages-container').innerHTML = `
         <div class="messages-layout">
-          <div class="conversations-list">
+          <div class="conversations-list${showConvList ? ' mobile-visible' : ''}">
             <h3 style="margin-bottom:1rem;font-size:1.1rem">שיחות</h3>
             ${conversations.map(c => `
               <div class="conversation-item ${c.other_user_id === currentUserId ? 'active' : ''}" onclick="openConversation('${c.other_user_id}')">
-                <div class="avatar-sm">${c.other_avatar ? `<img src="${c.other_avatar}" alt="">` : c.other_username[0]}</div>
+                <div class="avatar-sm">${c.other_avatar ? `<img src="${esc(c.other_avatar)}" alt="">` : esc(c.other_username[0])}</div>
                 <div class="conv-info">
-                  <div class="conv-name">${c.other_username}</div>
+                  <div class="conv-name">${esc(c.other_username)}</div>
                   <div class="conv-last-msg">${c.last_message ? esc(c.last_message) : 'אין הודעות'}</div>
                 </div>
                 ${c.unread_count > 0 ? `<div class="unread-badge">${c.unread_count}</div>` : ''}
               </div>
             `).join('')}
           </div>
-          <div id="chat-area">
-            ${currentUserId ? '<div class="spinner"></div>' : `
+          <div id="chat-area" class="${currentUserId && isMobile() ? '' : (!currentUserId ? '' : '')}">
+            ${currentUserId ? `
+              <button class="mobile-back-btn" onclick="backToConversations()">← כל השיחות</button>
+              <div class="spinner"></div>
+            ` : `
               <div class="empty-messages">
                 <div style="font-size:3rem;margin-bottom:1rem">💬</div>
                 <h3>בחר שיחה</h3>
@@ -134,6 +147,11 @@
       `;
 
       if (currentUserId) loadConversation(currentUserId);
+    }
+
+    function backToConversations() {
+      currentUserId = null;
+      renderMessages();
     }
 
     async function openConversation(userId) {
@@ -153,18 +171,19 @@
     function renderConversation(data) {
       const chatArea = document.getElementById('chat-area');
       chatArea.innerHTML = `
+        <button class="mobile-back-btn" onclick="backToConversations()">← כל השיחות</button>
         <div class="messages-area">
           <div class="messages-header">
-            <div class="avatar-sm">${data.user.avatar ? `<img src="${data.user.avatar}" alt="">` : data.user.username[0]}</div>
+            <div class="avatar-sm">${data.user.avatar ? `<img src="${esc(data.user.avatar)}" alt="">` : esc(data.user.username[0])}</div>
             <div>
-              <div style="font-weight:600">${data.user.username}</div>
+              <div style="font-weight:600">${esc(data.user.username)}</div>
               <div style="font-size:0.8rem;color:var(--text-secondary)">שיחה פרטית</div>
             </div>
           </div>
           <div class="messages-list" id="messages-list">
             ${data.messages.map(m => `
               <div class="message-item ${m.sender_id === Auth.getUser()?.id ? 'own' : ''}">
-                <div class="avatar-sm">${m.avatar ? `<img src="${m.avatar}" alt="">` : m.username[0]}</div>
+                <div class="avatar-sm">${m.avatar ? `<img src="${esc(m.avatar)}" alt="">` : esc(m.username[0])}</div>
                 <div class="message-bubble">
                   <div class="message-content">${esc(m.content)}</div>
                   <div class="message-time">${formatDateTime(m.created_at)}</div>
