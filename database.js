@@ -138,19 +138,27 @@ function initDB() {
     );
   `);
 
-  // Safe migration: add attribute column if not already present
+  // Migration table — tracks one-time operations so they never run twice
+  db.exec(`CREATE TABLE IF NOT EXISTS _migrations (name TEXT PRIMARY KEY, run_at TEXT)`);
+
+  // Safe column migrations
   try { db.exec(`ALTER TABLE users ADD COLUMN attribute TEXT DEFAULT ''`); } catch(e) {}
 
-  // Delete all test content created by admin users (seeded data) — no-op once cleaned
-  db.exec(`
-    DELETE FROM forum_posts WHERE thread_id IN (
-      SELECT t.id FROM forum_threads t
-      JOIN users u ON u.id = t.user_id WHERE u.role = 'admin'
-    );
-    DELETE FROM forum_threads WHERE user_id IN (SELECT id FROM users WHERE role = 'admin');
-    DELETE FROM event_applications WHERE event_id IN (SELECT id FROM events WHERE created_by IN (SELECT id FROM users WHERE role = 'admin'));
-    DELETE FROM events WHERE created_by IN (SELECT id FROM users WHERE role = 'admin');
-  `);
+  // One-time cleanup: delete seeded test content created by admin role
+  // Gated by migration flag so it never runs again after first execution
+  const cleaned = db.prepare(`SELECT 1 FROM _migrations WHERE name='clean_admin_seed'`).get();
+  if (!cleaned) {
+    db.exec(`
+      DELETE FROM forum_posts WHERE thread_id IN (
+        SELECT t.id FROM forum_threads t
+        JOIN users u ON u.id = t.user_id WHERE u.role = 'admin'
+      );
+      DELETE FROM forum_threads WHERE user_id IN (SELECT id FROM users WHERE role = 'admin');
+      DELETE FROM event_applications WHERE event_id IN (SELECT id FROM events WHERE created_by IN (SELECT id FROM users WHERE role = 'admin'));
+      DELETE FROM events WHERE created_by IN (SELECT id FROM users WHERE role = 'admin');
+    `);
+    db.prepare(`INSERT INTO _migrations (name, run_at) VALUES (?, ?)`).run('clean_admin_seed', new Date().toISOString());
+  }
 
   seedData();
 }
