@@ -83,6 +83,7 @@ app.use(express.json({ limit: '2mb' }));
 app.use(express.static(path.join(__dirname, 'public'), {
   maxAge: isProd ? '1y' : 0,
   immutable: isProd,
+  index: false, // HTML served by route handlers so they can inject ?v= cache-buster
 }));
 
 // ─── Health check for Railway ───
