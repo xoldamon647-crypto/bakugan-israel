@@ -3,7 +3,17 @@ const { db } = require('../database');
 const { authMiddleware, adminMiddleware, optionalAuth } = require('../middleware/auth');
 const router = express.Router();
 
+// Auto-complete events whose date has passed
+function autoCompleteEvents() {
+  db.prepare(`
+    UPDATE events SET status = 'completed'
+    WHERE status != 'completed' AND event_date IS NOT NULL AND event_date < datetime('now')
+  `).run();
+}
+
 router.get('/', optionalAuth, (req, res) => {
+  autoCompleteEvents();
+
   const { status, type } = req.query;
   let where = [];
   let params = [];
@@ -17,7 +27,9 @@ router.get('/', optionalAuth, (req, res) => {
     FROM events e
     JOIN users u ON u.id = e.created_by
     ${whereStr}
-    ORDER BY e.event_date ASC
+    ORDER BY
+      CASE e.status WHEN 'upcoming' THEN 0 WHEN 'ongoing' THEN 1 ELSE 2 END,
+      e.event_date ASC
   `).all(...params);
   res.json(events);
 });

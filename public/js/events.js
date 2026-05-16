@@ -1,5 +1,5 @@
 let allEvents = [];
-let currentFilter = 'all';
+let currentFilter = 'upcoming';
 let applyingEventId = null;
 
 const eventTypeLabels = { tournament: 'טורניר', casual: 'ידידותי', league: 'ליגה', exhibition: 'תערוכה' };
